@@ -27,7 +27,7 @@ export function Mission() {
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-foreground/15">
             <Compass className="h-6 w-6" aria-hidden="true" />
           </span>
-          <h2 className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra visión</h2>
+          <h2 id="vision" className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra visión</h2>
           <p className="mt-4 text-base leading-relaxed text-primary-foreground/85">
             Consolidarnos como una organización reconocida por su aporte a la conservación ambiental,
             la sostenibilidad y el desarrollo social, siendo un referente de trabajo colaborativo con
