@@ -22,8 +22,7 @@ export function Mission() {
 
         <Reveal
           delay={120}
-          id="vision"
-          className="rounded-3xl border border-primary-foreground/15 bg-primary-foreground/8 p-8 sm:p-10"
+          className="scroll-mt-28 rounded-3xl border border-primary-foreground/15 bg-primary-foreground/8 p-8 sm:p-10"
         >
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-foreground/15">
             <Compass className="h-6 w-6" aria-hidden="true" />
