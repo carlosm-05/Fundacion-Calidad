@@ -77,20 +77,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Fundación Calidad | Conservación ambiental y desarrollo sostenible" },
+      {
+        name: "description",
+        content:
+          "Fundación Calidad trabaja por la preservación del entorno ecológico, la protección de los recursos naturales y el bienestar de las comunidades.",
+      },
+      { name: "author", content: "Fundación Calidad" },
+      { property: "og:title", content: "Fundación Calidad | Conservación ambiental y desarrollo sostenible" },
+      {
+        property: "og:description",
+        content:
+          "Fundación Calidad trabaja por la preservación del entorno ecológico, la protección de los recursos naturales y el bienestar de las comunidades.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:url", content: "https://www.fundacioncalidad.org/" },
+      { property: "og:locale", content: "es_CO" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "canonical", href: "https://www.fundacioncalidad.org/" },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "shortcut icon", href: "/favicon.ico" },
@@ -104,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <HeadContent />
       </head>

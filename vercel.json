@@ -1,5 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/contacto-y-ubicacion(/:path)?",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/contacto-y-ubicación(/:path)?",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
