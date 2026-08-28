@@ -1,4 +1,4 @@
-import logo from "@/assets/logo-fundacion.png";
+import logo from "@/assets/logo-fundacion.jpg";
 import { contact, navLinks, projects } from "@/content/site";
 
 export function Footer() {

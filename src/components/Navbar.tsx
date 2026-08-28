@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo-fundacion.png";
+import logo from "@/assets/logo-fundacion.jpg";
 import { navLinks, org } from "@/content/site";
 import { cn } from "@/lib/utils";
 
