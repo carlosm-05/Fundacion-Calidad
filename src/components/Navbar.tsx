@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Heart, Menu, X } from "lucide-react";
 import logo from "@/assets/logo-fundacion.jpg";
-import { navLinks, org } from "@/content/site";
+import { donation, navLinks, org } from "@/content/site";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -19,7 +19,9 @@ export function Navbar() {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled ? "bg-background/95 shadow-soft backdrop-blur" : "bg-background/70 backdrop-blur-sm",
+        scrolled
+          ? "bg-background/95 shadow-soft backdrop-blur"
+          : "bg-background/70 backdrop-blur-sm",
       )}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
@@ -40,6 +42,13 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
+          <a
+            href={donation.pagePath}
+            className="ml-2 inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary"
+          >
+            <Heart className="h-4 w-4" />
+            Donar
+          </a>
           <a
             href="#contacto"
             className="ml-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
@@ -76,6 +85,14 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
+          <a
+            href={donation.pagePath}
+            onClick={() => setOpen(false)}
+            className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary"
+          >
+            <Heart className="h-4 w-4" />
+            Donar
+          </a>
         </nav>
       </div>
     </header>

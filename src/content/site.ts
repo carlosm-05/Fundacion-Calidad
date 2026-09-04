@@ -222,3 +222,53 @@ export const contact = {
     { label: "LinkedIn", href: "#" },
   ],
 };
+
+/**
+ * DONACIONES — Fundación Calidad
+ * -------------------------------------------------
+ * Reemplace cada `link` (o nº de cuenta) por la información real de la
+ * Fundación. El botón "Donar" lleva a la página /donacion.
+ */
+export const donation = {
+  pagePath: "/donacion",
+  banner:
+    "Tu apoyo es fundamental para seguir impulsando proyectos ambientales y sociales en el territorio. Con tu donación hacemos posible el trabajo con las comunidades.",
+  methods: [
+    {
+      id: "bancolombia",
+      name: "Bancolombia",
+      subtitle: "Cuenta de ahorros / corriente",
+      kind: "account",
+      reference: "PENDIENTE: Nº de cuenta",
+      placeholder: "Ej: 000-000000-00",
+      link: "https://www.bancolombia.com/personas",
+    },
+    {
+      id: "nequi",
+      name: "Nequi",
+      subtitle: "Transferencia a celular",
+      kind: "account",
+      reference: "3204457103",
+      placeholder: "",
+      link: "https://www.nequi.com.co",
+    },
+    {
+      id: "daviplata",
+      name: "DaviPlata",
+      subtitle: "Transferencia a celular",
+      kind: "account",
+      reference: "PENDIENTE: Nº de celular",
+      placeholder: "Ej: 300 000 0000",
+      link: "https://www.daviplata.com",
+    },
+    {
+      id: "paypal",
+      name: "PayPal",
+      subtitle: "Donación internacional segura",
+      kind: "link",
+      reference: "PENDIENTE: correo de PayPal",
+      placeholder: "Ej: donaciones@fundacioncalidad.org",
+      link: "https://www.paypal.com/donate",
+    },
+  ],
+};

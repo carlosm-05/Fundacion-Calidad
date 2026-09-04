@@ -1,10 +1,14 @@
+import { Heart } from "lucide-react";
 import heroImage from "@/assets/hero-forest.jpg";
 import { ActionLink } from "@/components/ui/action-button";
-import { org } from "@/content/site";
+import { donation, org } from "@/content/site";
 
 export function Hero() {
   return (
-    <section id="inicio" className="relative isolate flex min-h-[92vh] items-center overflow-hidden">
+    <section
+      id="inicio"
+      className="relative isolate flex min-h-[92vh] items-center overflow-hidden"
+    >
       <img
         src={heroImage}
         alt="Bosque de niebla con montañas verdes al amanecer"
@@ -32,6 +36,10 @@ export function Hero() {
             {org.intro}
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
+            <ActionLink href={donation.pagePath} variant="primary">
+              <Heart className="h-4 w-4" />
+              Haz una donación
+            </ActionLink>
             <ActionLink href="#proyectos" variant="outline">
               Conoce nuestros proyectos
             </ActionLink>

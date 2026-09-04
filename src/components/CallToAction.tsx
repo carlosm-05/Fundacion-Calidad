@@ -1,5 +1,7 @@
+import { Heart } from "lucide-react";
 import { ActionLink } from "@/components/ui/action-button";
 import { Reveal } from "@/components/ui/reveal";
+import { donation } from "@/content/site";
 
 export function CallToAction() {
   return (
@@ -8,15 +10,16 @@ export function CallToAction() {
         <Reveal className="rounded-[2rem] bg-primary px-7 py-14 text-center text-primary-foreground shadow-lift sm:px-14">
           <h2 className="text-3xl font-semibold sm:text-4xl">Sé parte del cambio</h2>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-primary-foreground/85">
-            El cuidado de nuestro entorno es una responsabilidad de todos. Conoce nuestras iniciativas
-            y ayúdanos a construir un futuro más sostenible.
+            El cuidado de nuestro entorno es una responsabilidad de todos. Conoce nuestras
+            iniciativas y ayúdanos a construir un futuro más sostenible.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <ActionLink href="#proyectos" variant="outline">
-              Conoce nuestros proyectos
+            <ActionLink href={donation.pagePath} variant="outline">
+              <Heart className="h-4 w-4" />
+              Haz una donación
             </ActionLink>
-            <ActionLink href="#contacto" variant="ghostLight">
-              Contáctanos
+            <ActionLink href="#proyectos" variant="ghostLight">
+              Conoce nuestros proyectos
             </ActionLink>
           </div>
         </Reveal>

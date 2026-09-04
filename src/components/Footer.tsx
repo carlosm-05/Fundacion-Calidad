@@ -1,5 +1,6 @@
+import { Heart } from "lucide-react";
 import logo from "@/assets/logo-fundacion.jpg";
-import { contact, navLinks, projects } from "@/content/site";
+import { contact, donation, navLinks, projects } from "@/content/site";
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -61,7 +62,14 @@ export function Footer() {
             <li>{contact.phone}</li>
             <li>{contact.address}</li>
           </ul>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={donation.pagePath}
+              className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary"
+            >
+              <Heart className="h-3.5 w-3.5" />
+              Donar
+            </a>
             {contact.social.map((s) => (
               <a
                 key={s.label}
