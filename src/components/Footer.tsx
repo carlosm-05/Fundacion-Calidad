@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import logo from "@/assets/logo-fundacion.jpg";
+import logo from "@/assets/logo-fundacion-circular.png";
 import { contact, donation, navLinks, projects } from "@/content/site";
 
 export function Footer() {
@@ -16,7 +16,7 @@ export function Footer() {
               width={40}
               height={40}
               loading="lazy"
-              className="h-10 w-10 rounded-full bg-primary-foreground/95 p-1"
+              className="h-10 w-10"
             />
             <span className="font-display text-lg font-semibold">Fundación Calidad</span>
           </div>
