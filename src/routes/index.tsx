@@ -5,7 +5,6 @@ import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Mission } from "@/components/Mission";
 import { Projects } from "@/components/Projects";
-import { EnvironmentalCommitment } from "@/components/EnvironmentalCommitment";
 import { Impact } from "@/components/Impact";
 import { News } from "@/components/News";
 import { CallToAction } from "@/components/CallToAction";
@@ -39,7 +38,6 @@ function Index() {
         <About />
         <Mission />
         <Projects />
-        <EnvironmentalCommitment />
         <Impact />
         <News />
         <CallToAction />

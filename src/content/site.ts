@@ -25,7 +25,6 @@ export const navLinks = [
   { label: "Inicio", href: "#inicio" },
   { label: "Nosotros", href: "#nosotros" },
   { label: "Proyectos", href: "#proyectos" },
-  { label: "Compromiso ambiental", href: "#compromiso" },
   { label: "Noticias", href: "#noticias" },
   { label: "Contacto", href: "#contacto" },
 ];
