@@ -30,34 +30,151 @@ export const navLinks = [
   { label: "Contacto", href: "#contacto" },
 ];
 
-export const projects = [
+export interface Project {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  detailPath: string;
+  detail: {
+    heroTitle: string;
+    summary: string;
+    fullDescription: string;
+    objectives: string[];
+    activities: string[];
+    impact: string;
+  };
+}
+
+export const projects: Project[] = [
   {
-    id: "conservacion",
-    title: "Conservación ambiental",
+    id: "permacultura",
+    slug: "permacultura",
+    title: "Permacultura",
     description:
-      "Acciones de protección y monitoreo de ecosistemas estratégicos, con apoyo de comunidades locales. (Texto provisional editable).",
-    image: projectConservation,
-  },
-  {
-    id: "educacion",
-    title: "Educación ecológica",
-    description:
-      "Talleres y jornadas formativas sobre cuidado del entorno dirigidos a niñas, niños y jóvenes. (Texto provisional editable).",
-    image: projectEducation,
-  },
-  {
-    id: "recuperacion",
-    title: "Recuperación de espacios naturales",
-    description:
-      "Intervenciones para restaurar zonas verdes, senderos y áreas degradadas del territorio. (Texto provisional editable).",
+      "Diseño de sistemas productivos sostenibles que integran seres humanos, tierra y recursos de forma armónica con el entorno natural.",
     image: projectRestoration,
+    detailPath: "/proyectos/permacultura",
+    detail: {
+      heroTitle: "Permacultura",
+      summary:
+        "Implementación de huertos, jardines y sistemas agroecológicos basados en los principios de permacultura para comunidades rurales y urbanas.",
+      fullDescription:
+        "El proyecto de Permacultura de la Fundación Calidad busca transformar la relación de las comunidades con la tierra mediante el diseño consciente de espacios productivos sostenibles. A través de la implementación de huertos agroecológicos, jardines de vivienda y sistemas integrados de producción de alimentos, promovemos la soberanía alimentaria y el cuidado del suelo. Nuestro enfoque se basa en los tres éticos de la permacultura: cuidado de la tierra, cuidado de las personas y reparto justo de los excedentes. Trabajamos con comunidades rurales y urbanas para adaptar estos principios a las condiciones locales del territorio colombiano.",
+      objectives: [
+        "Diseñar e implementar huertos agroecológicos en escuelas y comunidades.",
+        "Capacitar familias en técnicas de permacultura adaptadas al clima local.",
+        "Promover la producción de alimentos sin agroquímicos.",
+        "Reducir la huella de carbono mediante agricultura regenerativa.",
+        "Crear redes de intercambio de semillas y conocimientos ancestrales.",
+      ],
+      activities: [
+        "Talleres prácticos de diseño de huertos en espiral, bancales y policultivos.",
+        "Jornadas de siembra comunitaria con especies nativas y criollas.",
+        "Instalación de sistemas de captación y almacenamiento de agua lluvia.",
+        "Formación de multiplicadores comunitarios en permacultura.",
+        "Elaboración de compost y abonos orgánicos a partir de residuos locales.",
+      ],
+      impact:
+        "Se han establecido más de 15 huertos agroecológicos en comunidades del territorio, beneficiando a más de 200 familias con acceso a alimentos frescos y orgánicos.",
+    },
   },
   {
-    id: "comunidad",
-    title: "Participación comunitaria",
+    id: "compostaje",
+    slug: "compostaje",
+    title: "Compostaje",
     description:
-      "Espacios de trabajo conjunto con organizaciones y vecinos para liderar iniciativas ambientales. (Texto provisional editable).",
+      "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
+    image: projectConservation,
+    detailPath: "/proyectos/compostaje",
+    detail: {
+      heroTitle: "Compostaje",
+      summary:
+        "Programa de manejo integral de residuos orgánicos mediante técnicas de compostaje casera, comunitaria e industrial a pequeña escala.",
+      fullDescription:
+        "El programa de Compostaje de la Fundación Calidad tiene como objetivo reducir la cantidad de residuos orgánicos que llegan a los vertederos, transformándolos en un recurso valioso para la agricultura y el jardín. Mediante talleres, jornadas prácticas y acompañamiento técnico, enseñamos a comunidades, hogares y establecimientos a separar y procesar sus residuos orgánicos de manera eficiente. El compost resultante se utila para enriquecer suelos degradados, mejorar la retención de agua y disminuir la dependencia de fertilizantes químicos. Este proyecto también contribuye a la reducción de gases de efecto invernadero generados por la descomposición anaeróbica de residuos orgánicos en rellenos sanitarios.",
+      objectives: [
+        "Reducir al menos un 40% los residuos orgánicos enviados a vertederos.",
+        "Enseñar técnicas de compostaje casero y comunitario a familias.",
+        "Producir compost de calidad para huertos y zonas verdes municipales.",
+        "Sensibilizar sobre la importancia de la separación en la fuente.",
+        "Generar alternativas económicas de manejo de residuos.",
+      ],
+      activities: [
+        "Talleres de compostaje en escuelas y centros comunitarios.",
+        "Instalación de composteros domésticos y comunitarios.",
+        "Jornadas de sensibilización sobre separación de residuos.",
+        "Producción y distribución de compost a huertos comunitarios.",
+        "Seguimiento técnico y acompañamiento a familias participantes.",
+      ],
+      impact:
+        "Se han instalado más de 50 composteros en hogares y centros comunitarios, logrando la transformación de toneladas de residuos orgánicos en abono de alta calidad.",
+    },
+  },
+  {
+    id: "apicultura",
+    slug: "apicultura",
+    title: "Apicultura",
+    description:
+      "Promoción de la apicultura sostenible como herramienta de conservación de polinizadores y generación de ingresos para comunidades rurales.",
+    image: projectEducation,
+    detailPath: "/proyectos/apicultura",
+    detail: {
+      heroTitle: "Apicultura",
+      summary:
+        "Formación en manejo sostenible de colmenas, producción de miel y derivados, y conservación de polinizadores nativos del territorio.",
+      fullDescription:
+        "El proyecto de Apicultura de la Fundación Calidad impulsa una apicultura responsable que beneficia tanto a las comunidades como al ecosistema. Las abejas son polinizadores fundamentales para la biodiversidad y la producción de alimentos, sin embargo, enfrentan amenazas como el uso indiscriminado de pesticidas y la pérdida de hábitat. A través de este proyecto, capacitamos a familias rurales en el manejo sostenible de colmenas, la producción de miel, cera, propóleos y otros derivados apícolas, generando una fuente de ingresos complementaria. Al mismo tiempo, promovemos la creación de corredores biológicos de flora nativa que sirvan como alimento para las abejas y fortalezcan la biodiversidad local.",
+      objectives: [
+        "Capacitar a comunidades rurales en apicultura sostenible.",
+        "Conservar y proteger poblaciones de abejas nativas y mellíferas.",
+        "Generar ingresos económicos mediante la producción de miel y derivados.",
+        "Crear corredores biológicos de flora apícola en zonas estratégicas.",
+        "Reducir el uso de pesticidas en áreas de influencia del proyecto.",
+      ],
+      activities: [
+        "Cursos prácticos de instalación y manejo de colmenas.",
+        "Jornadas de instalación de apiarios en fincas comunitarias.",
+        "Talleres de extracción, procesamiento y envasado de miel.",
+        "Siembra de especies vegetales nativas para alimentación de abejas.",
+        "Monitoreo de poblaciones de abejas y evaluación de salud apícola.",
+      ],
+      impact:
+        "Se han establecido 12 apiarios comunitarios con más de 60 colmenas activas, produciendo miel certificada y generando ingresos sostenibles para 30 familias rurales.",
+    },
+  },
+  {
+    id: "reciclaje",
+    slug: "reciclaje",
+    title: "Reciclaje",
+    description:
+      "Estrategias de economía circular que convierten residuos en nuevos productos, reduciendo el impacto ambiental y fomentando la cultura del reciclaje.",
     image: projectCommunity,
+    detailPath: "/proyectos/reciclaje",
+    detail: {
+      heroTitle: "Reciclaje",
+      summary:
+        "Programa integral de reciclaje comunitario que promueve la separación en la fuente, la reutilización creativa y la economía circular.",
+      fullDescription:
+        "El proyecto de Reciclaje de la Fundación Calidad busca transformar la cultura de consumo y disposición de residuos en las comunidades. A través de programas educativos, jornadas de recolección selectiva y talleres de reutilización creativa, promovemos la economía circular como alternativa al modelo lineal de producir-usar-desechar. Trabajamos con escuelas, barrios y establecimientos comerciales para implementar sistemas de separación en la fuente que permitan la recuperación de materiales como papel, cartón, plásticos, vidrio y metales. Estos materiales se canalizan hacia recicladores formales e informales, fortaleciendo la cadena de reciclaje y generando oportunidades de empleo verde.",
+      objectives: [
+        "Implementar sistemas de separación en la fuente en barrios y escuelas.",
+        "Capacitar a la comunidad en los principios de la economía circular.",
+        "Recuperar y canalizar materiales reciclables hacia cadena formal.",
+        "Promover la reutilización creativa de residuos sólidos.",
+        "Reducir la cantidad de residuos que llegan a rellenos sanitarios.",
+      ],
+      activities: [
+        "Talleres de separación de residuos en hogares y escuelas.",
+        "Jornadas de recolección comunitaria de materiales reciclables.",
+        "Talleres artesanales de reutilización y upcycling.",
+        "Instalación de puntos limpios en barrios y centros educativos.",
+        "Campañas de comunicación para sensibilizar sobre reciclaje.",
+      ],
+      impact:
+        "Se han instalado 20 puntos limpios en barrios y escuelas, recuperando más de 5 toneladas de material reciclable y capacitando a 1.500 personas en separación de residuos.",
+    },
   },
 ];
 

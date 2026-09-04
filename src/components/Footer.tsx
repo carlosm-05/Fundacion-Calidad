@@ -43,7 +43,10 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
             {projects.map((project) => (
               <li key={project.id}>
-                <a href="#proyectos" className="transition-colors hover:text-primary-foreground">
+                <a
+                  href={project.detailPath}
+                  className="transition-colors hover:text-primary-foreground"
+                >
                   {project.title}
                 </a>
               </li>
