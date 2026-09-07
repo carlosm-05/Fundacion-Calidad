@@ -249,6 +249,14 @@ export const contact = {
   email: "correo@ejemplo.org",
   phone: "+57 000 000 0000",
   address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
+  /**
+   * WhatsApp — PROVISIONAL: reemplazar por el número real.
+   * Formato: https://wa.me/<codigo_pais><numero>?text=<mensaje%20prellenado>
+   */
+  whatsapp: {
+    href: "https://wa.me/573000000000?text=Hola%20Fundaci%C3%B3n%20Calidad%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n.",
+    label: "Escríbenos por WhatsApp",
+  },
   social: [
     {
       label: "Instagram",
