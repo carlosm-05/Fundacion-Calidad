@@ -1,6 +1,11 @@
-import { Heart } from "lucide-react";
+import { Facebook, Heart, Instagram } from "lucide-react";
 import logo from "@/assets/logo-fundacion-circular.png";
 import { contact, donation, navLinks, projects } from "@/content/site";
+
+const socialIcons: Record<string, typeof Instagram> = {
+  Instagram,
+  Facebook,
+};
 
 export function Footer() {
   const year = new Date().getFullYear();
@@ -10,14 +15,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
         <div>
           <div className="flex items-center gap-3">
-            <img
-              src={logo}
-              alt=""
-              width={40}
-              height={40}
-              loading="lazy"
-              className="h-10 w-10"
-            />
+            <img src={logo} alt="" width={40} height={40} loading="lazy" className="h-10 w-10" />
             <span className="font-display text-lg font-semibold">Fundación Calidad</span>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-primary-foreground/75">
@@ -70,15 +68,22 @@ export function Footer() {
               <Heart className="h-3.5 w-3.5" />
               Donar
             </a>
-            {contact.social.map((s) => (
-              <a
-                key={s.label}
-                href={s.href}
-                className="rounded-full border border-primary-foreground/30 px-3 py-1 text-xs transition-colors hover:bg-primary-foreground/15"
-              >
-                {s.label}
-              </a>
-            ))}
+            {contact.social.map((s) => {
+              const Icon = socialIcons[s.label] ?? Instagram;
+              return (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 px-4 py-2 text-xs font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/15 hover:text-primary-foreground"
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {s.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       </div>

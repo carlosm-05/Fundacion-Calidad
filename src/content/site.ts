@@ -6,10 +6,11 @@
  * de la Fundación. No se ha inventado ningún dato oficial.
  */
 
-import projectConservation from "@/assets/project-conservation.jpg";
-import projectEducation from "@/assets/project-education.jpg";
 import projectRestoration from "@/assets/project-restoration.jpg";
 import projectCommunity from "@/assets/project-community.jpg";
+import projectCompota from "@/assets/project-composta.png";
+import projectApicultura from "@/assets/project-apicultura.webp";
+import projectMtb from "@/assets/project-mtb.jpg";
 import newsCleanup from "@/assets/news-cleanup.jpg";
 import newsSeedling from "@/assets/news-seedling.jpg";
 import newsRecycling from "@/assets/news-recycling.jpg";
@@ -85,7 +86,7 @@ export const projects: Project[] = [
     title: "Compostaje",
     description:
       "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
-    image: projectConservation,
+    image: projectCompota,
     detailPath: "/proyectos/compostaje",
     detail: {
       heroTitle: "Compostaje",
@@ -117,7 +118,7 @@ export const projects: Project[] = [
     title: "Apicultura",
     description:
       "Promoción de la apicultura sostenible como herramienta de conservación de polinizadores y generación de ingresos para comunidades rurales.",
-    image: projectEducation,
+    image: projectApicultura,
     detailPath: "/proyectos/apicultura",
     detail: {
       heroTitle: "Apicultura",
@@ -175,6 +176,38 @@ export const projects: Project[] = [
         "Se han instalado 20 puntos limpios en barrios y escuelas, recuperando más de 5 toneladas de material reciclable y capacitando a 1.500 personas en separación de residuos.",
     },
   },
+  {
+    id: "pistas-mtb",
+    slug: "pistas-mtb",
+    title: "Pistas para MTB",
+    description:
+      "Construcción y mantenimiento de pistas de ciclomontañismo (MTB) para la práctica deportiva, la recreación y la realización de competencias.",
+    image: projectMtb,
+    detailPath: "/proyectos/pistas-mtb",
+    detail: {
+      heroTitle: "Pistas para MTB",
+      summary:
+        "Diseño, construcción y mantenimiento de pistas de ciclomontañismo (MTB) que promueven el deporte, la recreación en la naturaleza y las competencias de ciclomontañismo.",
+      fullDescription:
+        "El proyecto de Pistas para MTB de la Fundación Calidad impulsa la construcción y el mantenimiento de circuitos de ciclomontañismo seguros y sostenibles en el territorio. Estas pistas de ciclas están diseñadas para la práctica deportiva recreativa y la organización de competencias, fomentando hábitos de vida saludable y el aprovechamiento responsable de los espacios naturales. El proyecto articula la construcción de la infraestructura con procesos formativos: seguridad en la práctica, mecánica básica de la bicicleta, cuidado de los senderos y convivencia. Las competencias organizadas se convierten en escenario para dinamizar la economía local y fortalecer el tejido comunitario alrededor del deporte.",
+      objectives: [
+        "Diseñar y construir pistas de MTB con estándares de seguridad.",
+        "Promover el deporte y la recreación saludable entre jóvenes y familias.",
+        "Organizar competencias de ciclomontañismo a nivel municipal y regional.",
+        "Capacitar a la comunidad en seguridad vial y mecánica de bicicletas.",
+        "Fomentar el turismo deportivo y la economía local.",
+      ],
+      activities: [
+        "Levantamiento topográfico y diseño técnico de los circuitos.",
+        "Jornadas comunitarias de construcción y mantenimiento de pistas.",
+        "Instalación de señalización, rampas y zonas de descanso.",
+        "Escuelas de MTB para niños, jóvenes y principiantes.",
+        "Organización de carreras y rodadas recreativas.",
+      ],
+      impact:
+        "Se han construido 2 pistas de MTB en el territorio y se realizan rodadas y competencias con la participación de más de 300 deportistas de la región.",
+    },
+  },
 ];
 
 export const stats = [
@@ -215,11 +248,16 @@ export const news = [
 export const contact = {
   email: "correo@ejemplo.org",
   phone: "+57 000 000 0000",
-  address: "Dirección pendiente por definir, Colombia",
+  address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
   social: [
-    { label: "Facebook", href: "#" },
-    { label: "Instagram", href: "#" },
-    { label: "LinkedIn", href: "#" },
+    {
+      label: "Instagram",
+      href: "https://www.instagram.com/fundacioncalidadorg/",
+    },
+    {
+      label: "Facebook",
+      href: "https://www.facebook.com/people/Fundacion-Calidadorg/100081206269536/",
+    },
   ],
 };
 

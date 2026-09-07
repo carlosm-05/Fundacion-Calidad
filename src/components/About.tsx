@@ -1,25 +1,6 @@
-import { HandHeart, Leaf, Users } from "lucide-react";
 import aboutImage from "@/assets/about-community.jpg";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
-
-const values = [
-  {
-    icon: HandHeart,
-    title: "Compromiso",
-    text: "Trabajamos de forma constante y transparente por el cuidado del entorno que compartimos.",
-  },
-  {
-    icon: Leaf,
-    title: "Sostenibilidad",
-    text: "Promovemos prácticas que permitan usar los recursos naturales sin comprometer el futuro.",
-  },
-  {
-    icon: Users,
-    title: "Responsabilidad social",
-    text: "Acompañamos a las comunidades para que sean protagonistas de las iniciativas ambientales.",
-  },
-];
 
 export function About() {
   return (
@@ -36,25 +17,9 @@ export function About() {
             />
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
               Articulamos esfuerzos con comunidades, organizaciones y aliados para proteger los
-              ecosistemas, fortalecer la cultura ambiental y generar iniciativas sociales con impacto
-              real en el territorio. (Texto institucional provisional, editable).
+              ecosistemas, fortalecer la cultura ambiental y generar iniciativas sociales con
+              impacto real en el territorio. (Texto institucional provisional, editable).
             </p>
-
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              {values.map((value, i) => (
-                <Reveal
-                  key={value.title}
-                  delay={i * 90}
-                  className="rounded-2xl border border-border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-secondary/45 hover:shadow-lift"
-                >
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-                    <value.icon className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <h3 className="mt-4 text-base font-semibold text-primary">{value.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{value.text}</p>
-                </Reveal>
-              ))}
-            </div>
           </Reveal>
 
           <Reveal delay={120} className="order-1 lg:order-2">

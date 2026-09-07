@@ -84,7 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Fundación Calidad trabaja por la preservación del entorno ecológico, la protección de los recursos naturales y el bienestar de las comunidades.",
       },
       { name: "author", content: "Fundación Calidad" },
-      { property: "og:title", content: "Fundación Calidad | Conservación ambiental y desarrollo sostenible" },
+      {
+        property: "og:title",
+        content: "Fundación Calidad | Conservación ambiental y desarrollo sostenible",
+      },
       {
         property: "og:description",
         content:
@@ -103,6 +106,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "shortcut icon", href: "/favicon.ico" },
+    ],
+    scripts: [
+      {
+        children:
+          'if (window.location.pathname !== "/") { window.location.replace(window.location.origin + "/"); }',
+      },
     ],
   }),
   shellComponent: RootShell,

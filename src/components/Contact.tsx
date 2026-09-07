@@ -1,9 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Mail, MapPin, Phone, Share2 } from "lucide-react";
+import { Facebook, Instagram, Mail, MapPin, Phone, Share2 } from "lucide-react";
 import { ActionButton } from "@/components/ui/action-button";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { contact } from "@/content/site";
+
+const socialIcons: Record<string, typeof Instagram> = {
+  Instagram,
+  Facebook,
+};
 
 const fieldClass =
   "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-secondary focus:outline-none";
@@ -101,7 +106,10 @@ export function Contact() {
             </form>
           </Reveal>
 
-          <Reveal delay={120} className="rounded-3xl bg-primary p-7 text-primary-foreground shadow-lift sm:p-9">
+          <Reveal
+            delay={120}
+            className="rounded-3xl bg-primary p-7 text-primary-foreground shadow-lift sm:p-9"
+          >
             <h3 className="text-xl font-semibold">Datos de contacto</h3>
             <p className="mt-2 text-sm text-primary-foreground/70">
               Información de ejemplo, pendiente de reemplazar por los datos oficiales.
@@ -134,15 +142,22 @@ export function Contact() {
                 <span>
                   <span className="block font-semibold">Redes sociales</span>
                   <span className="mt-2 flex flex-wrap gap-2">
-                    {contact.social.map((s) => (
-                      <a
-                        key={s.label}
-                        href={s.href}
-                        className="rounded-full border border-primary-foreground/30 px-3 py-1 text-xs transition-colors hover:bg-primary-foreground/15"
-                      >
-                        {s.label}
-                      </a>
-                    ))}
+                    {contact.social.map((s) => {
+                      const Icon = socialIcons[s.label] ?? Instagram;
+                      return (
+                        <a
+                          key={s.label}
+                          href={s.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={s.label}
+                          className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 px-4 py-2 text-xs font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/15 hover:text-primary-foreground"
+                        >
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                          {s.label}
+                        </a>
+                      );
+                    })}
                   </span>
                 </span>
               </li>

@@ -11,12 +11,7 @@ export function Mission() {
           </span>
           <h2 className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra misión</h2>
           <p className="mt-4 text-base leading-relaxed text-primary-foreground/85">
-            Proteger el medio ambiente y contribuir a la conservación de los ecosistemas mediante
-            programas de educación ambiental, uso responsable de los recursos naturales e iniciativas
-            que generen bienestar en las comunidades donde trabajamos.
-          </p>
-          <p className="mt-3 text-sm text-primary-foreground/65">
-            (Texto de misión provisional, editable).
+      Nuestra mision es la preservacion de nuestro entorno y mejorar la calidad de vida de las personas a trabes del deporte,la ecologia y la convivencia, formentando proyectos y actividades que contribuyan a la conservacion del medio ambiente y la salud personal
           </p>
         </Reveal>
 
@@ -29,13 +24,9 @@ export function Mission() {
           </span>
           <h2 id="vision" className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra visión</h2>
           <p className="mt-4 text-base leading-relaxed text-primary-foreground/85">
-            Consolidarnos como una organización reconocida por su aporte a la conservación ambiental,
-            la sostenibilidad y el desarrollo social, siendo un referente de trabajo colaborativo con
-            las comunidades y sus territorios.
+       A traves de la planificacion estrategica y la cooperacion de la comunidad nacional e internacional, poder hacer obras concretas que mejoren las condiciones de vida de las perosnas a ser reconocidas a finales del 2025
           </p>
-          <p className="mt-3 text-sm text-primary-foreground/65">
-            (Texto de visión provisional, editable).
-          </p>
+        
         </Reveal>
       </div>
     </section>
