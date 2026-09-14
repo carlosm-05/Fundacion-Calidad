@@ -11,7 +11,9 @@ export function Mission() {
           </span>
           <h2 className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra misión</h2>
           <p className="mt-4 text-base leading-relaxed text-primary-foreground/85">
-      Nuestra mision es la preservacion de nuestro entorno y mejorar la calidad de vida de las personas a trabes del deporte,la ecologia y la convivencia, formentando proyectos y actividades que contribuyan a la conservacion del medio ambiente y la salud personal
+            Nuestra misión es la preservación de nuestro entorno y mejorar la calidad de vida de las
+            personas a través del deporte, la ecología y la convivencia, fomentando proyectos y
+            actividades que contribuyan a la conservación del medio ambiente y a la salud personal.
           </p>
         </Reveal>
 
@@ -22,11 +24,16 @@ export function Mission() {
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-foreground/15">
             <Compass className="h-6 w-6" aria-hidden="true" />
           </span>
-          <h2 id="vision" className="mt-6 text-3xl font-semibold sm:text-4xl">Nuestra visión</h2>
+          <h2 id="vision" className="mt-6 text-3xl font-semibold sm:text-4xl">
+            Nuestra visión
+          </h2>
           <p className="mt-4 text-base leading-relaxed text-primary-foreground/85">
-       A traves de la planificacion estrategica y la cooperacion de la comunidad nacional e internacional, poder hacer obras concretas que mejoren las condiciones de vida de las perosnas a ser reconocidas a finales del 2025
+            Para el año 2031, a través de la planificación estratégica y la cooperación de la
+            comunidad nacional e internacional, queremos haber realizado obras concretas que mejoren
+            las condiciones de vida de las personas y ser reconocidos como una organización
+            referente en la conservación del medio ambiente, la promoción del deporte y la
+            convivencia en el territorio.
           </p>
-        
         </Reveal>
       </div>
     </section>

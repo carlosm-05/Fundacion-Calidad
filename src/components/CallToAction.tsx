@@ -18,7 +18,7 @@ export function CallToAction() {
               <Heart className="h-4 w-4" />
               Haz una donación
             </ActionLink>
-            <ActionLink href="#proyectos" variant="ghostLight">
+            <ActionLink href="/#proyectos" variant="ghostLight">
               Conoce nuestros proyectos
             </ActionLink>
           </div>

@@ -7,7 +7,6 @@ import { Mission } from "@/components/Mission";
 import { Values } from "@/components/Values";
 import { Projects } from "@/components/Projects";
 import { Impact } from "@/components/Impact";
-import { News } from "@/components/News";
 import { CallToAction } from "@/components/CallToAction";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
@@ -41,7 +40,6 @@ function Index() {
         <Values />
         <Projects />
         <Impact />
-        <News />
         <CallToAction />
         <Contact />
       </main>

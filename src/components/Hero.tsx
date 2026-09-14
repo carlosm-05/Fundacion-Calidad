@@ -40,10 +40,10 @@ export function Hero() {
               <Heart className="h-4 w-4" />
               Haz una donación
             </ActionLink>
-            <ActionLink href="#proyectos" variant="outline">
+            <ActionLink href="/#proyectos" variant="outline">
               Conoce nuestros proyectos
             </ActionLink>
-            <ActionLink href="#contacto" variant="ghostLight">
+            <ActionLink href="/#contacto" variant="ghostLight">
               Contáctanos
             </ActionLink>
           </div>

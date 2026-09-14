@@ -7,13 +7,30 @@
  */
 
 import projectRestoration from "@/assets/project-restoration.jpg";
-import projectCommunity from "@/assets/project-community.jpg";
+import projectPermacultura1 from "@/assets/project-permacultura-1.jpg";
+import projectPermacultura2 from "@/assets/project-permacultura-2.jpg";
+import projectPermacultura3 from "@/assets/project-permacultura-3.jpg";
+import projectPermacultura4 from "@/assets/project-permacultura-4.jpg";
 import projectCompota from "@/assets/project-composta.png";
-import projectApicultura from "@/assets/project-apicultura.webp";
+import projectCompostaje1 from "@/assets/project-compostaje-1.jpg";
+import projectCompostaje2 from "@/assets/project-compostaje-2.jpg";
+import projectCompostaje3 from "@/assets/project-compostaje-3.jpg";
+import projectCompostaje4 from "@/assets/project-compostaje-4.jpg";
+import projectFauna from "@/assets/project-fauna.jpg";
+import projectFaunaTiti from "@/assets/project-fauna-titi.jpg";
+import projectFaunaTucan from "@/assets/project-fauna-tucan.jpg";
+import projectFaunaGuacamaya from "@/assets/project-fauna-guacamaya.jpg";
+import projectFaunaGarza from "@/assets/project-fauna-garza.jpg";
+import projectSenderismo from "@/assets/project-senderismo.jpg";
+import projectSenderismo2 from "@/assets/project-senderismo-2.jpg";
+import projectSenderismo3 from "@/assets/project-senderismo-3.jpg";
+import projectSenderismo4 from "@/assets/project-senderismo-4.jpg";
+import projectSenderismo5 from "@/assets/project-senderismo-5.jpg";
 import projectMtb from "@/assets/project-mtb.jpg";
-import newsCleanup from "@/assets/news-cleanup.jpg";
-import newsSeedling from "@/assets/news-seedling.jpg";
-import newsRecycling from "@/assets/news-recycling.jpg";
+import projectMtb1 from "@/assets/project-mtb-pista-1.jpg";
+import projectMtb2 from "@/assets/project-mtb-pista-2.jpg";
+import projectMtb4 from "@/assets/project-mtb-pista-4.jpg";
+import projectMtb5 from "@/assets/project-mtb-pista-5.jpg";
 
 export const org = {
   name: "Fundación Calidad",
@@ -23,11 +40,10 @@ export const org = {
 };
 
 export const navLinks = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Nosotros", href: "#nosotros" },
-  { label: "Proyectos", href: "#proyectos" },
-  { label: "Noticias", href: "#noticias" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Inicio", href: "/#inicio" },
+  { label: "Nosotros", href: "/#nosotros" },
+  { label: "Proyectos", href: "/#proyectos" },
+  { label: "Contacto", href: "/#contacto" },
 ];
 
 export interface Project {
@@ -37,6 +53,7 @@ export interface Project {
   description: string;
   image: string;
   detailPath: string;
+  gallery?: { src: string; alt: string }[];
   detail: {
     heroTitle: string;
     summary: string;
@@ -56,12 +73,30 @@ export const projects: Project[] = [
       "Diseño de sistemas productivos sostenibles que integran seres humanos, tierra y recursos de forma armónica con el entorno natural.",
     image: projectRestoration,
     detailPath: "/proyectos/permacultura",
+    gallery: [
+      {
+        src: projectPermacultura1,
+        alt: "Jardín de permacultura con huerto y vivienda sostenible",
+      },
+      {
+        src: projectPermacultura2,
+        alt: "Bancales elevados para cultivo de alimentos",
+      },
+      {
+        src: projectPermacultura3,
+        alt: "Sendero entre cultivos agroforestales y bosque",
+      },
+      {
+        src: projectPermacultura4,
+        alt: "Huerta orgánica en finca agroecológica",
+      },
+    ],
     detail: {
       heroTitle: "Permacultura",
       summary:
         "Implementación de huertos, jardines y sistemas agroecológicos basados en los principios de permacultura para comunidades rurales y urbanas.",
       fullDescription:
-        "El proyecto de Permacultura de la Fundación Calidad busca transformar la relación de las comunidades con la tierra mediante el diseño consciente de espacios productivos sostenibles. A través de la implementación de huertos agroecológicos, jardines de vivienda y sistemas integrados de producción de alimentos, promovemos la soberanía alimentaria y el cuidado del suelo. Nuestro enfoque se basa en los tres éticos de la permacultura: cuidado de la tierra, cuidado de las personas y reparto justo de los excedentes. Trabajamos con comunidades rurales y urbanas para adaptar estos principios a las condiciones locales del territorio colombiano.",
+        "El proyecto de Permacultura de la Fundación Calidad busca transformar la relación de las comunidades con la tierra mediante el diseño consciente de espacios productivos sostenibles. A través de la implementación de huertos agroecológicos, jardines de vivienda y sistemas integrados de producción de alimentos, promovemos la soberanía alimentaria y el cuidado del suelo. Nuestro enfoque se basa en los tres éticos de la permacultura: cuidado de la tierra, cuidado de las personas y reparto justo de los excedentes. Trabajamos con comunidades rurales y urbanas para adaptar estos principios a las condiciones locales del territorio colombiano, con especial énfasis en el piedemonte llanero donde se ubica la Fundación, en Villavicencio (Meta).",
       objectives: [
         "Diseñar e implementar huertos agroecológicos en escuelas y comunidades.",
         "Capacitar familias en técnicas de permacultura adaptadas al clima local.",
@@ -88,12 +123,30 @@ export const projects: Project[] = [
       "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
     image: projectCompota,
     detailPath: "/proyectos/compostaje",
+    gallery: [
+      {
+        src: projectCompostaje1,
+        alt: "Sistema de compostaje casero en el hogar",
+      },
+      {
+        src: projectCompostaje2,
+        alt: "Pila de compost en proceso de descomposición",
+      },
+      {
+        src: projectCompostaje3,
+        alt: "Recipiente de lombricomposta con material orgánico",
+      },
+      {
+        src: projectCompostaje4,
+        alt: "Recipiente de residuos orgánicos para compostaje",
+      },
+    ],
     detail: {
       heroTitle: "Compostaje",
       summary:
         "Programa de manejo integral de residuos orgánicos mediante técnicas de compostaje casera, comunitaria e industrial a pequeña escala.",
       fullDescription:
-        "El programa de Compostaje de la Fundación Calidad tiene como objetivo reducir la cantidad de residuos orgánicos que llegan a los vertederos, transformándolos en un recurso valioso para la agricultura y el jardín. Mediante talleres, jornadas prácticas y acompañamiento técnico, enseñamos a comunidades, hogares y establecimientos a separar y procesar sus residuos orgánicos de manera eficiente. El compost resultante se utila para enriquecer suelos degradados, mejorar la retención de agua y disminuir la dependencia de fertilizantes químicos. Este proyecto también contribuye a la reducción de gases de efecto invernadero generados por la descomposición anaeróbica de residuos orgánicos en rellenos sanitarios.",
+        "El programa de Compostaje de la Fundación Calidad tiene como objetivo reducir la cantidad de residuos orgánicos que llegan a los vertederos, transformándolos en un recurso valioso para la agricultura y el jardín. Mediante talleres, jornadas prácticas y acompañamiento técnico, enseñamos a comunidades, hogares y establecimientos a separar y procesar sus residuos orgánicos de manera eficiente. El compost resultante se utiliza para enriquecer suelos degradados, mejorar la retención de agua y disminuir la dependencia de fertilizantes químicos. Este proyecto también contribuye a la reducción de gases de efecto invernadero generados por la descomposición anaeróbica de residuos orgánicos en rellenos sanitarios.",
       objectives: [
         "Reducir al menos un 40% los residuos orgánicos enviados a vertederos.",
         "Enseñar técnicas de compostaje casero y comunitario a familias.",
@@ -113,135 +166,166 @@ export const projects: Project[] = [
     },
   },
   {
-    id: "apicultura",
-    slug: "apicultura",
-    title: "Apicultura",
+    id: "avistamiento-de-fauna",
+    slug: "avistamiento-de-fauna",
+    title: "Avistamiento de fauna",
     description:
-      "Promoción de la apicultura sostenible como herramienta de conservación de polinizadores y generación de ingresos para comunidades rurales.",
-    image: projectApicultura,
-    detailPath: "/proyectos/apicultura",
+      "Recorridos guiados para observar la fauna silvestre de la Orinoquía en su hábitat natural: monos titis, aves, osos hormigueros y más especies del piedemonte llanero.",
+    image: projectFauna,
+    detailPath: "/proyectos/avistamiento-de-fauna",
+    gallery: [
+      {
+        src: projectFaunaTiti,
+        alt: "Mono tití, una de las especies más fáciles de observar en el piedemonte llanero",
+      },
+      {
+        src: projectFaunaTucan,
+        alt: "Tucán pico irís, ave emblemática de los bosques del Meta",
+      },
+      {
+        src: projectFaunaGuacamaya,
+        alt: "Guacamayas, aves coloridas de la Orinoquía colombiana",
+      },
+      {
+        src: projectFaunaGarza,
+        alt: "Garza pescando en un humedal del piedemonte llanero",
+      },
+    ],
     detail: {
-      heroTitle: "Apicultura",
+      heroTitle: "Avistamiento de fauna",
       summary:
-        "Formación en manejo sostenible de colmenas, producción de miel y derivados, y conservación de polinizadores nativos del territorio.",
+        "Caminatas guiadas por los bosques y sabanas del piedemonte llanero para conocer la fauna silvestre de la Orinoquía: monos titis, tucanes, garzas, guacamayas, chigüiros y el oso hormiguero del Llano.",
       fullDescription:
-        "El proyecto de Apicultura de la Fundación Calidad impulsa una apicultura responsable que beneficia tanto a las comunidades como al ecosistema. Las abejas son polinizadores fundamentales para la biodiversidad y la producción de alimentos, sin embargo, enfrentan amenazas como el uso indiscriminado de pesticidas y la pérdida de hábitat. A través de este proyecto, capacitamos a familias rurales en el manejo sostenible de colmenas, la producción de miel, cera, propóleos y otros derivados apícolas, generando una fuente de ingresos complementaria. Al mismo tiempo, promovemos la creación de corredores biológicos de flora nativa que sirvan como alimento para las abejas y fortalezcan la biodiversidad local.",
+        "El proyecto de Avistamiento de fauna de la Fundación Calidad nace de la riqueza biológica del territorio donde trabajamos, en el piedemonte de la cordillera Oriental y la sabana de la Orinoquía colombiana, en Villavicencio (Meta). Esta región alberga alrededor de 1.200 especies de aves, más de 320 mamíferos, 270 anfibios y 290 reptiles, y Villavicencio aporta cerca del 35 % de las aves registradas en el departamento, con más de 230 especies. En el Global Big Day 2025, el Meta ocupó el primer lugar nacional con 658 especies reportadas, y Colombia lideró el mundo en ese registro.\n\nA través de recorridos responsables de bajo impacto, nos acercamos a las especies más comunes y fáciles de ver en la zona: el mono tití y otras especies de primates, el oso hormiguero del Llano (bandera), chigüiros, venados cola blanca, dantas y armadillos; y entre las aves, tucanes de pico irís, guacamayas, loros, garzas, colibríes y paujiles. En los cuerpos de agua se observan babillas, tortugas y una enorme variedad de peces, y en las noches, murciélagos: en Villavicencio se han registrado al menos 62 especies. El avistamiento se realiza con binoculares, fotografías sin flash y en silencio, respetando las distancias y los horarios de mayor actividad (madrugada y atardecer), siguiendo el manual de avistamiento responsable de fauna silvestre de la Orinoquía. La reserva natural de la Fundación —una finca de 10 hectáreas con abundante vegetación en el piedemonte— es el principal escenario de estas caminatas, junto con las rutas y reservas vecinas.",
       objectives: [
-        "Capacitar a comunidades rurales en apicultura sostenible.",
-        "Conservar y proteger poblaciones de abejas nativas y mellíferas.",
-        "Generar ingresos económicos mediante la producción de miel y derivados.",
-        "Crear corredores biológicos de flora apícola en zonas estratégicas.",
-        "Reducir el uso de pesticidas en áreas de influencia del proyecto.",
+        "Promover el conocimiento y la valoración de la fauna silvestre del Meta.",
+        "Fomentar el avistamiento responsable y de bajo impacto en los senderos.",
+        "Registrar la biodiversidad presente en los predios de la Fundación y sus alrededores.",
+        "Sensibilizar sobre especies icónicas y amenazadas como el oso hormiguero del Llano.",
+        "Generar ingresos sostenibles para la comunidad mediante el ecoturismo de observación.",
       ],
       activities: [
-        "Cursos prácticos de instalación y manejo de colmenas.",
-        "Jornadas de instalación de apiarios en fincas comunitarias.",
-        "Talleres de extracción, procesamiento y envasado de miel.",
-        "Siembra de especies vegetales nativas para alimentación de abejas.",
-        "Monitoreo de poblaciones de abejas y evaluación de salud apícola.",
+        "Caminatas guiadas de observación de aves al amanecer y al atardecer.",
+        "Recorridos de búsqueda de monos titis y otros primates del piedemonte.",
+        "Talleres de fotografía de naturaleza y dibujo de campo.",
+        "Jornadas de ciencia ciudadana con plataformas como eBird e iNaturalist.",
+        "Charlas sobre avistamiento responsable y conservación de hábitats.",
       ],
       impact:
-        "Se han establecido 12 apiarios comunitarios con más de 60 colmenas activas, produciendo miel certificada y generando ingresos sostenibles para 30 familias rurales.",
+        "La reserva natural de la Fundación, de 10 hectáreas de bosque y vegetación en el piedemonte llanero, es el escenario principal de las caminatas de avistamiento, donde se han registrado especies como el oso hormiguero del Llano, monos titis, tucanes y guacamayas, con la participación de observadores locales y visitantes de toda la región.",
     },
   },
   {
-    id: "reciclaje",
-    slug: "reciclaje",
-    title: "Reciclaje",
+    id: "senderismo",
+    slug: "senderismo",
+    title: "Senderismo",
     description:
-      "Estrategias de economía circular que convierten residuos en nuevos productos, reduciendo el impacto ambiental y fomentando la cultura del reciclaje.",
-    image: projectCommunity,
-    detailPath: "/proyectos/reciclaje",
+      "Recorridos a pie por los senderos ecológicos del piedemonte llanero que combinan deporte, naturaleza y educación ambiental, aptos para todas las edades.",
+    image: projectSenderismo,
+    detailPath: "/proyectos/senderismo",
+    gallery: [
+      {
+        src: projectSenderismo,
+        alt: "Sendero ecológico entre bosque y vegetación nativa",
+      },
+      {
+        src: projectSenderismo2,
+        alt: "Camino de senderismo a través del bosque",
+      },
+      {
+        src: projectSenderismo3,
+        alt: "Caminante con morral recorriendo la montaña",
+      },
+      {
+        src: projectSenderismo4,
+        alt: "Cascada en medio de la selva y el bosque",
+      },
+      {
+        src: projectSenderismo5,
+        alt: "Bosque de niebla y montaña en el trópico",
+      },
+    ],
     detail: {
-      heroTitle: "Reciclaje",
+      heroTitle: "Senderismo",
       summary:
-        "Programa integral de reciclaje comunitario que promueve la separación en la fuente, la reutilización creativa y la economía circular.",
+        "Caminatas ecológicas por los senderos de Villavicencio y el piedemonte llanero, con guías locales, señalización segura y mínimo impacto en la naturaleza.",
       fullDescription:
-        "El proyecto de Reciclaje de la Fundación Calidad busca transformar la cultura de consumo y disposición de residuos en las comunidades. A través de programas educativos, jornadas de recolección selectiva y talleres de reutilización creativa, promovemos la economía circular como alternativa al modelo lineal de producir-usar-desechar. Trabajamos con escuelas, barrios y establecimientos comerciales para implementar sistemas de separación en la fuente que permitan la recuperación de materiales como papel, cartón, plásticos, vidrio y metales. Estos materiales se canalizan hacia recicladores formales e informales, fortaleciendo la cadena de reciclaje y generando oportunidades de empleo verde.",
+        "El proyecto de Senderismo de la Fundación Calidad promueve la caminata como una actividad saludable, de bajo costo y en contacto con la naturaleza. Villavicencio cuenta con una amplia oferta de senderos que la Fundación aprovecha y apoya para sus recorridos: la vereda El Carmen, con cerca de 6 kilómetros de subida sobre la ciudad; el Alto de Buenavista, de aproximadamente 11 kilómetros por la antigua vía a Bogotá; el Parque El Bambú, de 16 hectáreas con un 80 % de bosque natural y senderos ecológicos aptos para todas las edades; la Cascada Palmichal, una caminata exigente de unas 3 horas con caudal de agua como recompensa; y el Cerro de los Siete Colores, dentro de la ciudad.\n\nEstas salidas se enmarcan en el fortalecimiento de las caminatas ecológicas y turísticas de Villavicencio, institucionalizadas en el Acuerdo Municipal 571 de 2023, y se articulan con iniciativas comunitarias como la ruta ecoturística 'La Sociedad de los Sueños' en el barrio Villa Lorena Bajo, que recorre unos 3 kilómetros junto a las cascadas de Caño Grande y Caño Equis con guías locales. Para la temporada seca (enero a marzo y julio a agosto) se programan también salidas hacia la Sierra de la Macarena y Caño Cristales, bajo los protocolos del parque nacional. Cada caminata incluye recomendaciones de hidratación, calzado, bloqueador y prácticas 'no dejar huella' para conservar los senderos.",
       objectives: [
-        "Implementar sistemas de separación en la fuente en barrios y escuelas.",
-        "Capacitar a la comunidad en los principios de la economía circular.",
-        "Recuperar y canalizar materiales reciclables hacia cadena formal.",
-        "Promover la reutilización creativa de residuos sólidos.",
-        "Reducir la cantidad de residuos que llegan a rellenos sanitarios.",
+        "Abrir y mantener senderos ecológicos seguros y señalizados.",
+        "Promover hábitos de vida saludable a través de la caminata.",
+        "Vincular a guías locales y familias en el turismo comunitario.",
+        "Educar sobre la flora y la fauna del territorio durante los recorridos.",
+        "Apoyar las rutas institucionalizadas por el Acuerdo Municipal 571 de 2023.",
       ],
       activities: [
-        "Talleres de separación de residuos en hogares y escuelas.",
-        "Jornadas de recolección comunitaria de materiales reciclables.",
-        "Talleres artesanales de reutilización y upcycling.",
-        "Instalación de puntos limpios en barrios y centros educativos.",
-        "Campañas de comunicación para sensibilizar sobre reciclaje.",
+        "Caminatas guiadas por la vereda El Carmen y el Alto de Buenavista.",
+        "Recorridos por el Parque El Bambú y la Cascada Palmichal.",
+        "Rutas familiares y escolares de bajo nivel de dificultad.",
+        "Jornadas de señalización y limpieza de senderos sin dejar huella.",
+        "Caminatas culturales con historias y saberes de guías comunitarios.",
       ],
       impact:
-        "Se han instalado 20 puntos limpios en barrios y escuelas, recuperando más de 5 toneladas de material reciclable y capacitando a 1.500 personas en separación de residuos.",
+        "Se han acondicionado y señalizado los primeros senderos interpretativos, y las caminatas mensuales reúnen a más de 40 personas, articuladas con las rutas institucionalizadas por el municipio de Villavicencio y con el turismo comunitario.",
     },
   },
   {
-    id: "pistas-mtb",
-    slug: "pistas-mtb",
-    title: "Pistas para MTB",
+    id: "pista-eliana-caicedo",
+    slug: "pista-eliana-caicedo",
+    title: "Pista Eliana Caicedo",
     description:
-      "Construcción y mantenimiento de pistas de ciclomontañismo (MTB) para la práctica deportiva, la recreación y la realización de competencias.",
+      "La pista de ciclomontañismo de la Fundación, dedicada a Eliana Caicedo, campeona mundial y panamericana de MTB: deporte, recreación y competencias en una sola pista.",
     image: projectMtb,
-    detailPath: "/proyectos/pistas-mtb",
+    detailPath: "/proyectos/pista-eliana-caicedo",
+    gallery: [
+      {
+        src: projectMtb1,
+        alt: "Rodada por senderos de montaña estilo cross country",
+      },
+      {
+        src: projectMtb2,
+        alt: "Competencia de mountain bike en terreno irregular",
+      },
+      {
+        src: projectMtb4,
+        alt: "Camino forestal para bicicleta de montaña",
+      },
+      {
+        src: projectMtb5,
+        alt: "Descenso de MTB en carrera downhill",
+      },
+    ],
     detail: {
-      heroTitle: "Pistas para MTB",
+      heroTitle: "Pista Eliana Caicedo — MTB",
       summary:
-        "Diseño, construcción y mantenimiento de pistas de ciclomontañismo (MTB) que promueven el deporte, la recreación en la naturaleza y las competencias de ciclomontañismo.",
+        "La pista de ciclomontañismo Eliana Caicedo: un circuito dedicado a la campeona mundial llanera para la práctica deportiva, rodadas recreativas y competencias de MTB.",
       fullDescription:
-        "El proyecto de Pistas para MTB de la Fundación Calidad impulsa la construcción y el mantenimiento de circuitos de ciclomontañismo seguros y sostenibles en el territorio. Estas pistas de ciclas están diseñadas para la práctica deportiva recreativa y la organización de competencias, fomentando hábitos de vida saludable y el aprovechamiento responsable de los espacios naturales. El proyecto articula la construcción de la infraestructura con procesos formativos: seguridad en la práctica, mecánica básica de la bicicleta, cuidado de los senderos y convivencia. Las competencias organizadas se convierten en escenario para dinamizar la economía local y fortalecer el tejido comunitario alrededor del deporte.",
+        "La Fundación Calidad cuenta con la Pista Eliana Caicedo, la pista de ciclomontañismo bautizada en honor a la deportista llanera Eliana Caicedo Romero, nacida en Villavicencio (Meta). Eliana se coronó campeona mundial de Cross Country Olímpico (XCO), categoría Máster, en el Campeonato Mundial disputado en Villa La Angostura, Argentina, en abril de 2022, y semanas después se consagró campeona panamericana de la misma modalidad en Catamarca, Argentina. A su palmarés se suman el título de la Copa Colombia de Maratón, el Campeonato Nacional Máster y múltiples medallas de oro y plata en competencias nacionales, además de ser una de las mayores exponentes del ciclismo femenino de esta modalidad en el país.\n\nLa pista aprovecha el relieve natural del piedemonte llanero sobre los terrenos verdes de la Fundación, con un circuito que combina subidas, bajadas y curvas técnicas para la práctica recreativa, las rodadas y las competencias de MTB. Además del escenario deportivo, el proyecto sostiene una escuela de MTB para niños, jóvenes y principiantes, talleres de mecánica básica y seguridad en la pista, y jornadas comunitarias de mantenimiento y señalización. Las imágenes actuales corresponden a pistas genéricas referenciales; próximamente se publicarán las fotografías reales de la pista Eliana Caicedo.",
       objectives: [
-        "Diseñar y construir pistas de MTB con estándares de seguridad.",
-        "Promover el deporte y la recreación saludable entre jóvenes y familias.",
-        "Organizar competencias de ciclomontañismo a nivel municipal y regional.",
-        "Capacitar a la comunidad en seguridad vial y mecánica de bicicletas.",
-        "Fomentar el turismo deportivo y la economía local.",
+        "Mantener y mejorar la única pista de MTB de la Fundación, la Pista Eliana Caicedo.",
+        "Honrar la trayectoria de Eliana Caicedo como referente del ciclismo llanero y colombiano.",
+        "Organizar rodadas recreativas y cronoescaladas abiertas a la comunidad.",
+        "Formar una escuela de MTB para niños, jóvenes y principiantes.",
+        "Promover el turismo deportivo y los hábitos de vida saludable en la región.",
       ],
       activities: [
-        "Levantamiento topográfico y diseño técnico de los circuitos.",
-        "Jornadas comunitarias de construcción y mantenimiento de pistas.",
-        "Instalación de señalización, rampas y zonas de descanso.",
-        "Escuelas de MTB para niños, jóvenes y principiantes.",
-        "Organización de carreras y rodadas recreativas.",
+        "Jornadas comunitarias de construcción, mantenimiento y señalización de la pista.",
+        "Rodadas recreativas y cronoescaladas semanales.",
+        "Escuela de MTB para niños, jóvenes y principiantes.",
+        "Talleres de mecánica básica, seguridad y convivencia en la pista.",
+        "Encuentros y rodadas inspiradas en la trayectoria de Eliana Caicedo.",
       ],
       impact:
-        "Se han construido 2 pistas de MTB en el territorio y se realizan rodadas y competencias con la participación de más de 300 deportistas de la región.",
+        "La Pista Eliana Caicedo es el escenario de rodadas y competencias que reúnen a más de 300 deportistas de la región, y un homenaje permanente a la campeona mundial y panamericana de ciclomontañismo nacida en Villavicencio.",
     },
   },
 ];
 
 export const stats = [
-  { label: "Proyectos realizados", value: "00" },
-  { label: "Personas beneficiadas", value: "000" },
-  { label: "Jornadas ambientales", value: "00" },
-  { label: "Espacios recuperados", value: "00" },
-];
-
-export const news = [
-  {
-    id: "jornada-limpieza",
-    date: "Fecha por definir",
-    title: "Jornada de limpieza de fuentes hídricas",
-    excerpt:
-      "Contenido de demostración: reseña de una jornada de limpieza realizada junto a voluntarios de la comunidad.",
-    image: newsCleanup,
-  },
-  {
-    id: "siembra",
-    date: "Fecha por definir",
-    title: "Siembra de especies nativas",
-    excerpt:
-      "Contenido de demostración: actividad de reforestación con especies propias del territorio.",
-    image: newsSeedling,
-  },
-  {
-    id: "reciclaje",
-    date: "Fecha por definir",
-    title: "Taller de reciclaje y aprovechamiento de residuos",
-    excerpt:
-      "Contenido de demostración: formación práctica sobre separación en la fuente y economía circular.",
-    image: newsRecycling,
-  },
+  { label: "Proyectos realizados", value: "5" },
+  { label: "Personas beneficiadas", value: "600+" },
+  { label: "Jornadas ambientales", value: "8" },
+  { label: "Área natural de la finca (m²)", value: "90.000" },
 ];
 
 /** PROVISIONAL: reemplazar por los datos oficiales de la Fundación. */

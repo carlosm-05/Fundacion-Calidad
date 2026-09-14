@@ -25,7 +25,7 @@ export function Navbar() {
       )}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 lg:px-8">
-        <a href="#inicio" className="flex items-center gap-3" aria-label={`${org.name} — inicio`}>
+        <a href="/#inicio" className="flex items-center gap-3" aria-label={`${org.name} — inicio`}>
           <img src={logo} alt="" width={40} height={40} className="h-10 w-10" />
           <span className="font-display text-base font-semibold leading-tight text-primary sm:text-lg">
             Fundación <span className="text-secondary">Calidad</span>
@@ -50,7 +50,7 @@ export function Navbar() {
             Donar
           </a>
           <a
-            href="#contacto"
+            href="/#contacto"
             className="ml-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
           >
             Contáctanos
