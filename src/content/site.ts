@@ -56,6 +56,7 @@ export interface Project {
   detailPath: string;
   gallery?: { src: string; alt: string }[];
   video?: { youtubeId: string; title: string };
+  instagram?: { postUrl: string; title: string };
   detail: {
     heroTitle: string;
     summary: string;
@@ -96,6 +97,10 @@ export const projects: Project[] = [
     video: {
       youtubeId: "02eTYR0R96c",
       title: "Recorrido de la Pista para MTB",
+    },
+    instagram: {
+      postUrl: "https://www.instagram.com/p/Ck-943IL2P1/",
+      title: "Eliana Caicedo, campeona mundial de MTB",
     },
     detail: {
       heroTitle: "Pista para MTB",

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle, Leaf, Play, Target, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle, Instagram, Leaf, Play, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -148,6 +148,61 @@ function ProjectVideo({ youtubeId, title }: { youtubeId: string; title: string }
   );
 }
 
+function ProjectInstagram({
+  postUrl,
+  title,
+  poster,
+}: {
+  postUrl: string;
+  title: string;
+  poster: string;
+}) {
+  const [playing, setPlaying] = useState(false);
+  const shortcode = postUrl.match(/instagram\.com\/(?:p|reel|reels|tv)\/([^/?#]+)/i)?.[1];
+  const embedUrl = shortcode ? `https://www.instagram.com/p/${shortcode}/embed` : postUrl;
+
+  return (
+    <div>
+      <h2 className="font-display text-2xl font-bold text-foreground">{title}</h2>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-black shadow-soft">
+        {playing ? (
+          <iframe
+            className="h-[620px] w-full"
+            src={embedUrl}
+            title={title}
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPlaying(true)}
+            aria-label={`Reproducir video: ${title}`}
+            className="group relative block aspect-[4/5] w-full sm:aspect-video"
+          >
+            <img
+              src={poster}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover opacity-60 transition-opacity group-hover:opacity-75"
+            />
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-primary/40 transition-colors group-hover:bg-primary/50">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-primary shadow-lift transition-transform group-hover:scale-110">
+                <Play className="h-7 w-7 translate-x-0.5 fill-current" />
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-black/45 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur">
+                <Instagram className="h-4 w-4" />
+                Ver video
+              </span>
+            </span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ProjectDetail() {
   const { slug } = Route.useParams();
   const project = projects.find((p) => p.slug === slug);
@@ -221,6 +276,16 @@ function ProjectDetail() {
                     </p>
                   </div>
                 </Reveal>
+
+                {project.instagram ? (
+                  <Reveal>
+                    <ProjectInstagram
+                      postUrl={project.instagram.postUrl}
+                      title={project.instagram.title}
+                      poster={project.image}
+                    />
+                  </Reveal>
+                ) : null}
 
                 {project.video ? (
                   <Reveal>
