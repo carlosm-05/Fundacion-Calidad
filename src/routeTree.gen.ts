@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DonacionRouteImport } from './routes/donacion'
+import { Route as MetalmecanicosRouteImport } from './routes/metalmecanicos'
 import { Route as ProyectosSlugRouteImport } from './routes/proyectos/$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const DonacionRoute = DonacionRouteImport.update({
   path: '/donacion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetalmecanicosRoute = MetalmecanicosRouteImport.update({
+  id: '/metalmecanicos',
+  path: '/metalmecanicos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProyectosSlugRoute = ProyectosSlugRouteImport.update({
   id: '/proyectos/$slug',
   path: '/proyectos/$slug',
@@ -32,30 +38,34 @@ const ProyectosSlugRoute = ProyectosSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/donacion': typeof DonacionRoute
+  '/metalmecanicos': typeof MetalmecanicosRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/donacion': typeof DonacionRoute
+  '/metalmecanicos': typeof MetalmecanicosRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/donacion': typeof DonacionRoute
+  '/metalmecanicos': typeof MetalmecanicosRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/donacion' | '/proyectos/$slug'
+  fullPaths: '/' | '/donacion' | '/metalmecanicos' | '/proyectos/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/donacion' | '/proyectos/$slug'
-  id: '__root__' | '/' | '/donacion' | '/proyectos/$slug'
+  to: '/' | '/donacion' | '/metalmecanicos' | '/proyectos/$slug'
+  id: '__root__' | '/' | '/donacion' | '/metalmecanicos' | '/proyectos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DonacionRoute: typeof DonacionRoute
+  MetalmecanicosRoute: typeof MetalmecanicosRoute
   ProyectosSlugRoute: typeof ProyectosSlugRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DonacionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metalmecanicos': {
+      id: '/metalmecanicos'
+      path: '/metalmecanicos'
+      fullPath: '/metalmecanicos'
+      preLoaderRoute: typeof MetalmecanicosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/proyectos/$slug': {
       id: '/proyectos/$slug'
       path: '/proyectos/$slug'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DonacionRoute: DonacionRoute,
+  MetalmecanicosRoute: MetalmecanicosRoute,
   ProyectosSlugRoute: ProyectosSlugRoute,
 }
 export const routeTree = rootRouteImport

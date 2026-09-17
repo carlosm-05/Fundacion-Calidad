@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CheckCircle, Leaf, Target, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle, Leaf, Play, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -103,6 +103,51 @@ function ProjectGallery({ images }: { images: { src: string; alt: string }[] }) 
   );
 }
 
+function ProjectVideo({ youtubeId, title }: { youtubeId: string; title: string }) {
+  const [playing, setPlaying] = useState(false);
+  const thumbnail = `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg`;
+
+  return (
+    <div>
+      <h2 className="font-display text-2xl font-bold text-foreground">{title}</h2>
+      <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-2xl border border-border bg-black shadow-soft">
+        {playing ? (
+          <iframe
+            className="absolute inset-0 h-full w-full"
+            src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPlaying(true)}
+            aria-label={`Reproducir video: ${title}`}
+            className="group absolute inset-0 h-full w-full"
+          >
+            <img
+              src={thumbnail}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+              onError={(event) => {
+                event.currentTarget.src = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+              }}
+            />
+            <span className="absolute inset-0 flex items-center justify-center bg-primary/30 transition-colors group-hover:bg-primary/40">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 text-primary shadow-lift transition-transform group-hover:scale-110">
+                <Play className="h-7 w-7 translate-x-0.5 fill-current" />
+              </span>
+            </span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function ProjectDetail() {
   const { slug } = Route.useParams();
   const project = projects.find((p) => p.slug === slug);
@@ -171,11 +216,17 @@ function ProjectDetail() {
                     <h2 className="font-display text-2xl font-bold text-foreground">
                       Sobre el proyecto
                     </h2>
-                    <p className="mt-4 leading-relaxed text-muted-foreground">
+                    <p className="mt-4 whitespace-pre-line leading-relaxed text-muted-foreground">
                       {detail.fullDescription}
                     </p>
                   </div>
                 </Reveal>
+
+                {project.video ? (
+                  <Reveal>
+                    <ProjectVideo youtubeId={project.video.youtubeId} title={project.video.title} />
+                  </Reveal>
+                ) : null}
 
                 <Reveal>
                   <div>

@@ -27,10 +27,10 @@ import projectSenderismo3 from "@/assets/project-senderismo-3.jpg";
 import projectSenderismo4 from "@/assets/project-senderismo-4.jpg";
 import projectSenderismo5 from "@/assets/project-senderismo-5.jpg";
 import projectMtb from "@/assets/project-mtb.jpg";
-import projectMtb1 from "@/assets/project-mtb-pista-1.jpg";
-import projectMtb2 from "@/assets/project-mtb-pista-2.jpg";
-import projectMtb4 from "@/assets/project-mtb-pista-4.jpg";
-import projectMtb5 from "@/assets/project-mtb-pista-5.jpg";
+import projectMtb1 from "@/assets/project-mtb-pista-1.jpeg";
+import projectMtb2 from "@/assets/project-mtb-pista-2.jpeg";
+import projectMtb3 from "@/assets/project-mtb-pista-3.jpeg";
+import projectMtb4 from "@/assets/project-mtb-pista-4.jpeg";
 
 export const org = {
   name: "Fundación Calidad",
@@ -43,6 +43,7 @@ export const navLinks = [
   { label: "Inicio", href: "/#inicio" },
   { label: "Nosotros", href: "/#nosotros" },
   { label: "Proyectos", href: "/#proyectos" },
+  { label: "Metalmecánicos", href: "/metalmecanicos" },
   { label: "Contacto", href: "/#contacto" },
 ];
 
@@ -54,6 +55,7 @@ export interface Project {
   image: string;
   detailPath: string;
   gallery?: { src: string; alt: string }[];
+  video?: { youtubeId: string; title: string };
   detail: {
     heroTitle: string;
     summary: string;
@@ -66,153 +68,57 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: "permacultura",
-    slug: "permacultura",
-    title: "Permacultura",
+    id: "pista-eliana-caicedo",
+    slug: "pista-eliana-caicedo",
+    title: "Pista para MTB",
     description:
-      "Diseño de sistemas productivos sostenibles que integran seres humanos, tierra y recursos de forma armónica con el entorno natural.",
-    image: projectRestoration,
-    detailPath: "/proyectos/permacultura",
+      "El MTB es una disciplina emocionante que se practica off-road por trochas y senderos montañosos. Nuestra Pista 'Eliana Caicedo' combina downhill, peraltes, switchbacks y obstáculos naturales.",
+    image: projectMtb,
+    detailPath: "/proyectos/pista-eliana-caicedo",
     gallery: [
       {
-        src: projectPermacultura1,
-        alt: "Jardín de permacultura con huerto y vivienda sostenible",
+        src: projectMtb1,
+        alt: "Descenso de los peraltes en carrera",
       },
       {
-        src: projectPermacultura2,
-        alt: "Bancales elevados para cultivo de alimentos",
+        src: projectMtb2,
+        alt: "Competencia de MTB en terreno irregular",
       },
       {
-        src: projectPermacultura3,
-        alt: "Sendero entre cultivos agroforestales y bosque",
+        src: projectMtb3,
+        alt: "Subidas serpenteantes que desafían la potencia",
       },
       {
-        src: projectPermacultura4,
-        alt: "Huerta orgánica en finca agroecológica",
+        src: projectMtb4,
+        alt: "Puentes, puntos de control de la carrera",
       },
     ],
-    detail: {
-      heroTitle: "Permacultura",
-      summary:
-        "Implementación de huertos, jardines y sistemas agroecológicos basados en los principios de permacultura para comunidades rurales y urbanas.",
-      fullDescription:
-        "El proyecto de Permacultura de la Fundación Calidad busca transformar la relación de las comunidades con la tierra mediante el diseño consciente de espacios productivos sostenibles. A través de la implementación de huertos agroecológicos, jardines de vivienda y sistemas integrados de producción de alimentos, promovemos la soberanía alimentaria y el cuidado del suelo. Nuestro enfoque se basa en los tres éticos de la permacultura: cuidado de la tierra, cuidado de las personas y reparto justo de los excedentes. Trabajamos con comunidades rurales y urbanas para adaptar estos principios a las condiciones locales del territorio colombiano, con especial énfasis en el piedemonte llanero donde se ubica la Fundación, en Villavicencio (Meta).",
-      objectives: [
-        "Diseñar e implementar huertos agroecológicos en escuelas y comunidades.",
-        "Capacitar familias en técnicas de permacultura adaptadas al clima local.",
-        "Promover la producción de alimentos sin agroquímicos.",
-        "Reducir la huella de carbono mediante agricultura regenerativa.",
-        "Crear redes de intercambio de semillas y conocimientos ancestrales.",
-      ],
-      activities: [
-        "Talleres prácticos de diseño de huertos en espiral, bancales y policultivos.",
-        "Jornadas de siembra comunitaria con especies nativas y criollas.",
-        "Instalación de sistemas de captación y almacenamiento de agua lluvia.",
-        "Formación de multiplicadores comunitarios en permacultura.",
-        "Elaboración de compost y abonos orgánicos a partir de residuos locales.",
-      ],
-      impact:
-        "Se han establecido más de 15 huertos agroecológicos en comunidades del territorio, beneficiando a más de 200 familias con acceso a alimentos frescos y orgánicos.",
+    video: {
+      youtubeId: "02eTYR0R96c",
+      title: "Recorrido de la Pista para MTB",
     },
-  },
-  {
-    id: "compostaje",
-    slug: "compostaje",
-    title: "Compostaje",
-    description:
-      "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
-    image: projectCompota,
-    detailPath: "/proyectos/compostaje",
-    gallery: [
-      {
-        src: projectCompostaje1,
-        alt: "Sistema de compostaje casero en el hogar",
-      },
-      {
-        src: projectCompostaje2,
-        alt: "Pila de compost en proceso de descomposición",
-      },
-      {
-        src: projectCompostaje3,
-        alt: "Recipiente de lombricomposta con material orgánico",
-      },
-      {
-        src: projectCompostaje4,
-        alt: "Recipiente de residuos orgánicos para compostaje",
-      },
-    ],
     detail: {
-      heroTitle: "Compostaje",
+      heroTitle: "Pista para MTB",
       summary:
-        "Programa de manejo integral de residuos orgánicos mediante técnicas de compostaje casera, comunitaria e industrial a pequeña escala.",
+        "Un circuito profesional de ciclomontañismo dedicado a Eliana Caicedo, campeona mundial de Mountain Bike: downhill, peraltes, switchbacks y obstáculos naturales sobre el relieve del piedemonte llanero.",
       fullDescription:
-        "El programa de Compostaje de la Fundación Calidad tiene como objetivo reducir la cantidad de residuos orgánicos que llegan a los vertederos, transformándolos en un recurso valioso para la agricultura y el jardín. Mediante talleres, jornadas prácticas y acompañamiento técnico, enseñamos a comunidades, hogares y establecimientos a separar y procesar sus residuos orgánicos de manera eficiente. El compost resultante se utiliza para enriquecer suelos degradados, mejorar la retención de agua y disminuir la dependencia de fertilizantes químicos. Este proyecto también contribuye a la reducción de gases de efecto invernadero generados por la descomposición anaeróbica de residuos orgánicos en rellenos sanitarios.",
+        'El MTB (Mountain Bike o Ciclomontañismo) es una emocionante disciplina del ciclismo que se practica off-road, desafiando terrenos naturales complejos, trochas y senderos montañosos donde la resistencia física, la técnica y la conexión con el entorno son fundamentales. Una pista de MTB es un circuito diseñado específicamente para este deporte, dotado de elementos naturales y artificiales que ponen a prueba las habilidades de manejo, reflejos y destreza de cada ciclista.\n\nUn homenaje a nuestra tierra: Pista de MTB "Eliana Caicedo"\n\nNuestra pista lleva con orgullo el nombre de Eliana Caicedo, destacada ciclista colombiana oriunda de Villavicencio (Meta), quien ha dejado en alto el tricolor nacional al coronarse campeona mundial de ciclomontañismo (Master A de Mountain Bike), además de sumar múltiples títulos nacionales y panamericanos. Su disciplina, resiliencia y amor por el deporte llanero son la máxima inspiración de este escenario, diseñado para impulsar el talento local y ofrecer un espacio a la altura de los grandes deportistas.\n\nRetos y obstáculos del circuito\n\nEl trazado está pensado para ofrecer una experiencia dinámica y exigente, integrando los obstáculos más emocionantes y comunes de las pistas profesionales de MTB:\n\nZonas de Downhill y descensos técnicos: Sectores de bajada rápida y pronunciada que exigen máxima concentración, control de frenado y lectura del terreno.\n\nPeraltes: Curvas peraltadas diseñadas con inclinación estratégica que permiten mantener la velocidad, fluidez y estabilidad al girar con seguridad.\n\nSubidas en zig-zag (switchbacks): Ascensos serpenteantes que desafían la potencia cardiovascular y la técnica de pedaleo en pendiente, obligando al ciclista a trazar curvas cerradas hacia arriba sin perder el equilibrio.\n\nObstáculos naturales y pasos técnicos: Senderos complementados con raíces, rocas y desniveles que enriquecen la aventura y ponen a prueba las capacidades de integración entre la bicicleta y el terreno.\n\nYa sea para entrenar al máximo nivel o para disfrutar de la velocidad y la naturaleza, la Pista de MTB Eliana Caicedo representa el punto de encuentro perfecto entre la pasión por el pedal y la exigencia del deporte de montaña.',
       objectives: [
-        "Reducir al menos un 40% los residuos orgánicos enviados a vertederos.",
-        "Enseñar técnicas de compostaje casero y comunitario a familias.",
-        "Producir compost de calidad para huertos y zonas verdes municipales.",
-        "Sensibilizar sobre la importancia de la separación en la fuente.",
-        "Generar alternativas económicas de manejo de residuos.",
+        "Impulsar el talento llanero con un escenario deportivo a la altura de los grandes del MTB.",
+        "Mantener un circuito profesional con descensos técnicos, peraltes, switchbacks y obstáculos naturales.",
+        "Honrar la trayectoria de Eliana Caicedo, campeona mundial y múltiple campeona nacional y panamericana.",
+        "Promover la práctica recreativa, el entrenamiento y las competencias de ciclomontañismo.",
+        "Fomentar la técnica, la resistencia y la conexión con el entorno natural.",
       ],
       activities: [
-        "Talleres de compostaje en escuelas y centros comunitarios.",
-        "Instalación de composteros domésticos y comunitarios.",
-        "Jornadas de sensibilización sobre separación de residuos.",
-        "Producción y distribución de compost a huertos comunitarios.",
-        "Seguimiento técnico y acompañamiento a familias participantes.",
+        "Zonas de downhill y descensos técnicos: sectores de bajada rápida y pronunciada que exigen control de frenado y lectura del terreno.",
+        "Peraltes: curvas peraltadas con inclinación estratégica para mantener velocidad, fluidez y estabilidad al girar.",
+        "Subidas en zig-zag (switchbacks): ascensos serpenteantes que desafían la potencia cardiovascular y la técnica de pedaleo.",
+        "Obstáculos naturales y pasos técnicos: raíces, rocas y desniveles para integrar la bicicleta y el terreno.",
+        "Rodadas, entrenamientos y competencias para la comunidad y los deportistas de la región.",
       ],
       impact:
-        "Se han instalado más de 50 composteros en hogares y centros comunitarios, logrando la transformación de toneladas de residuos orgánicos en abono de alta calidad.",
-    },
-  },
-  {
-    id: "avistamiento-de-fauna",
-    slug: "avistamiento-de-fauna",
-    title: "Avistamiento de fauna",
-    description:
-      "Recorridos guiados para observar la fauna silvestre de la Orinoquía en su hábitat natural: monos titis, aves, osos hormigueros y más especies del piedemonte llanero.",
-    image: projectFauna,
-    detailPath: "/proyectos/avistamiento-de-fauna",
-    gallery: [
-      {
-        src: projectFaunaTiti,
-        alt: "Mono tití, una de las especies más fáciles de observar en el piedemonte llanero",
-      },
-      {
-        src: projectFaunaTucan,
-        alt: "Tucán pico irís, ave emblemática de los bosques del Meta",
-      },
-      {
-        src: projectFaunaGuacamaya,
-        alt: "Guacamayas, aves coloridas de la Orinoquía colombiana",
-      },
-      {
-        src: projectFaunaGarza,
-        alt: "Garza pescando en un humedal del piedemonte llanero",
-      },
-    ],
-    detail: {
-      heroTitle: "Avistamiento de fauna",
-      summary:
-        "Caminatas guiadas por los bosques y sabanas del piedemonte llanero para conocer la fauna silvestre de la Orinoquía: monos titis, tucanes, garzas, guacamayas, chigüiros y el oso hormiguero del Llano.",
-      fullDescription:
-        "El proyecto de Avistamiento de fauna de la Fundación Calidad nace de la riqueza biológica del territorio donde trabajamos, en el piedemonte de la cordillera Oriental y la sabana de la Orinoquía colombiana, en Villavicencio (Meta). Esta región alberga alrededor de 1.200 especies de aves, más de 320 mamíferos, 270 anfibios y 290 reptiles, y Villavicencio aporta cerca del 35 % de las aves registradas en el departamento, con más de 230 especies. En el Global Big Day 2025, el Meta ocupó el primer lugar nacional con 658 especies reportadas, y Colombia lideró el mundo en ese registro.\n\nA través de recorridos responsables de bajo impacto, nos acercamos a las especies más comunes y fáciles de ver en la zona: el mono tití y otras especies de primates, el oso hormiguero del Llano (bandera), chigüiros, venados cola blanca, dantas y armadillos; y entre las aves, tucanes de pico irís, guacamayas, loros, garzas, colibríes y paujiles. En los cuerpos de agua se observan babillas, tortugas y una enorme variedad de peces, y en las noches, murciélagos: en Villavicencio se han registrado al menos 62 especies. El avistamiento se realiza con binoculares, fotografías sin flash y en silencio, respetando las distancias y los horarios de mayor actividad (madrugada y atardecer), siguiendo el manual de avistamiento responsable de fauna silvestre de la Orinoquía. La reserva natural de la Fundación —una finca de 10 hectáreas con abundante vegetación en el piedemonte— es el principal escenario de estas caminatas, junto con las rutas y reservas vecinas.",
-      objectives: [
-        "Promover el conocimiento y la valoración de la fauna silvestre del Meta.",
-        "Fomentar el avistamiento responsable y de bajo impacto en los senderos.",
-        "Registrar la biodiversidad presente en los predios de la Fundación y sus alrededores.",
-        "Sensibilizar sobre especies icónicas y amenazadas como el oso hormiguero del Llano.",
-        "Generar ingresos sostenibles para la comunidad mediante el ecoturismo de observación.",
-      ],
-      activities: [
-        "Caminatas guiadas de observación de aves al amanecer y al atardecer.",
-        "Recorridos de búsqueda de monos titis y otros primates del piedemonte.",
-        "Talleres de fotografía de naturaleza y dibujo de campo.",
-        "Jornadas de ciencia ciudadana con plataformas como eBird e iNaturalist.",
-        "Charlas sobre avistamiento responsable y conservación de hábitats.",
-      ],
-      impact:
-        "La reserva natural de la Fundación, de 10 hectáreas de bosque y vegetación en el piedemonte llanero, es el escenario principal de las caminatas de avistamiento, donde se han registrado especies como el oso hormiguero del Llano, monos titis, tucanes y guacamayas, con la participación de observadores locales y visitantes de toda la región.",
+        "La Pista de MTB Eliana Caicedo representa el punto de encuentro perfecto entre la pasión por el pedal y la exigencia del deporte de montaña, un homenaje permanente a la campeona mundial de ciclomontañismo y un escenario que impulsa el talento deportivo local.",
     },
   },
   {
@@ -270,53 +176,153 @@ export const projects: Project[] = [
     },
   },
   {
-    id: "pista-eliana-caicedo",
-    slug: "pista-eliana-caicedo",
-    title: "Pista Eliana Caicedo",
+    id: "avistamiento-de-fauna",
+    slug: "avistamiento-de-fauna",
+    title: "Avistamiento de fauna",
     description:
-      "La pista de ciclomontañismo de la Fundación, dedicada a Eliana Caicedo, campeona mundial y panamericana de MTB: deporte, recreación y competencias en una sola pista.",
-    image: projectMtb,
-    detailPath: "/proyectos/pista-eliana-caicedo",
+      "Caminatas de avistamiento y exploración por la reserva natural de la Fundación para observar la biodiversidad del piedemonte llanero en su estado más puro.",
+    image: projectFauna,
+    detailPath: "/proyectos/avistamiento-de-fauna",
     gallery: [
       {
-        src: projectMtb1,
-        alt: "Rodada por senderos de montaña estilo cross country",
+        src: projectFaunaTiti,
+        alt: "Mono tití, una de las especies más fáciles de observar en el piedemonte llanero",
       },
       {
-        src: projectMtb2,
-        alt: "Competencia de mountain bike en terreno irregular",
+        src: projectFaunaTucan,
+        alt: "Tucán pico irís, ave emblemática de los bosques del Meta",
       },
       {
-        src: projectMtb4,
-        alt: "Camino forestal para bicicleta de montaña",
+        src: projectFaunaGuacamaya,
+        alt: "Guacamayas, aves coloridas de la Orinoquía colombiana",
       },
       {
-        src: projectMtb5,
-        alt: "Descenso de MTB en carrera downhill",
+        src: projectFaunaGarza,
+        alt: "Garza pescando en un humedal del piedemonte llanero",
       },
     ],
     detail: {
-      heroTitle: "Pista Eliana Caicedo — MTB",
+      heroTitle: "Avistamiento de fauna",
       summary:
-        "La pista de ciclomontañismo Eliana Caicedo: un circuito dedicado a la campeona mundial llanera para la práctica deportiva, rodadas recreativas y competencias de MTB.",
+        "Caminatas de avistamiento y exploración por la reserva natural de la Fundación —9 hectáreas de exuberante vegetación en el piedemonte— para conectar con la biodiversidad en su estado más puro.",
       fullDescription:
-        "La Fundación Calidad cuenta con la Pista Eliana Caicedo, la pista de ciclomontañismo bautizada en honor a la deportista llanera Eliana Caicedo Romero, nacida en Villavicencio (Meta). Eliana se coronó campeona mundial de Cross Country Olímpico (XCO), categoría Máster, en el Campeonato Mundial disputado en Villa La Angostura, Argentina, en abril de 2022, y semanas después se consagró campeona panamericana de la misma modalidad en Catamarca, Argentina. A su palmarés se suman el título de la Copa Colombia de Maratón, el Campeonato Nacional Máster y múltiples medallas de oro y plata en competencias nacionales, además de ser una de las mayores exponentes del ciclismo femenino de esta modalidad en el país.\n\nLa pista aprovecha el relieve natural del piedemonte llanero sobre los terrenos verdes de la Fundación, con un circuito que combina subidas, bajadas y curvas técnicas para la práctica recreativa, las rodadas y las competencias de MTB. Además del escenario deportivo, el proyecto sostiene una escuela de MTB para niños, jóvenes y principiantes, talleres de mecánica básica y seguridad en la pista, y jornadas comunitarias de mantenimiento y señalización. Las imágenes actuales corresponden a pistas genéricas referenciales; próximamente se publicarán las fotografías reales de la pista Eliana Caicedo.",
+        "En la Fundación Calidad creemos que la mejor manera de conservar es conocer y valorar lo que nos rodea. Por ello, hemos convertido nuestra reserva natural —una finca de 9 hectáreas, equivalentes a 90.000 metros cuadrados de exuberante vegetación en el piedemonte— en el principal escenario de nuestras caminatas de avistamiento y exploración, un refugio vivo que se extiende y fortalece al conectarse directamente con las rutas y reservas vecinas de la región.\n\nNuestros recorridos están pensados para conectar al visitante con la biodiversidad en su estado más puro, ofreciendo una experiencia inmersiva a través de diferentes experiencias:\n\nAvistamiento de aves: Los cielos y los árboles del piedemonte son el hogar perfecto para una gran diversidad de especies aladas que llenan el entorno de colores, cantos y movimiento, convirtiendo cada caminata en un deleite para los amantes de la ornitología.\n\nMonos titís y fauna fascinante: Los senderos permiten apreciar de cerca la gracia del mono tití y otros animales emblemáticos de la zona, como el oso hormiguero, cuyos rastros y apariciones silenciosas sorprenden a quienes recorren el bosque.\n\nUn ecosistema variado, hongos y mariposas: El alma de la reserva va mucho más allá de los grandes animales. Cada rincón es un microcosmos vibrante donde revolotean coloridas mariposas y donde el suelo y los troncos albergan una fascinante variedad de hongos y organismos descomponedores, esenciales para mantener el equilibrio y la salud de este bosque tropical.\n\nA través de un turismo de bajo impacto, respetuoso de los tiempos y espacios naturales, te invitamos a caminar con nosotros, respirar el aire puro del piedemonte y ser parte activa de la protección de nuestro patrimonio natural.",
       objectives: [
-        "Mantener y mejorar la única pista de MTB de la Fundación, la Pista Eliana Caicedo.",
-        "Honrar la trayectoria de Eliana Caicedo como referente del ciclismo llanero y colombiano.",
-        "Organizar rodadas recreativas y cronoescaladas abiertas a la comunidad.",
-        "Formar una escuela de MTB para niños, jóvenes y principiantes.",
-        "Promover el turismo deportivo y los hábitos de vida saludable en la región.",
+        "Promover el conocimiento y la valoración de la biodiversidad del piedemonte llanero.",
+        "Ofrecer experiencias inmersivas de avistamiento de aves, monos titís y fauna emblemática.",
+        "Fomentar un turismo de bajo impacto, respetuoso de los tiempos y espacios naturales.",
+        "Visibilizar el ecosistema variado de hongos, mariposas y organismos descomponedores.",
+        "Fortalecer la red de rutas y reservas vecinas mediante recorridos responsables.",
       ],
       activities: [
-        "Jornadas comunitarias de construcción, mantenimiento y señalización de la pista.",
-        "Rodadas recreativas y cronoescaladas semanales.",
-        "Escuela de MTB para niños, jóvenes y principiantes.",
-        "Talleres de mecánica básica, seguridad y convivencia en la pista.",
-        "Encuentros y rodadas inspiradas en la trayectoria de Eliana Caicedo.",
+        "Caminatas de avistamiento de aves por los cielos y bosques del piedemonte.",
+        "Recorridos para apreciar de cerca el mono tití y otros animales emblemáticos como el oso hormiguero.",
+        "Exploración del ecosistema variado: mariposas, hongos y organismos descomponedores.",
+        "Turismo de bajo impacto, respetuoso de los tiempos y espacios naturales.",
+        "Experiencias inmersivas para caminar, respirar el aire puro y ser parte activa de la conservación.",
       ],
       impact:
-        "La Pista Eliana Caicedo es el escenario de rodadas y competencias que reúnen a más de 300 deportistas de la región, y un homenaje permanente a la campeona mundial y panamericana de ciclomontañismo nacida en Villavicencio.",
+        "La reserva natural de la Fundación —una finca de 9 hectáreas, equivalentes a 90.000 metros cuadrados de exuberante vegetación en el piedemonte— es el principal escenario de las caminatas de avistamiento y exploración, ofreciendo una experiencia inmersiva con la biodiversidad del territorio y conectándose con las rutas y reservas vecinas de la región.",
+    },
+  },
+  {
+    id: "compostaje",
+    slug: "compostaje",
+    title: "Compostaje",
+    description:
+      "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
+    image: projectCompota,
+    detailPath: "/proyectos/compostaje",
+    gallery: [
+      {
+        src: projectCompostaje1,
+        alt: "Sistema de compostaje casero en el hogar",
+      },
+      {
+        src: projectCompostaje2,
+        alt: "Pila de compost en proceso de descomposición",
+      },
+      {
+        src: projectCompostaje3,
+        alt: "Recipiente de lombricomposta con material orgánico",
+      },
+      {
+        src: projectCompostaje4,
+        alt: "Recipiente de residuos orgánicos para compostaje",
+      },
+    ],
+    detail: {
+      heroTitle: "Compostaje",
+      summary:
+        "Programa de manejo integral de residuos orgánicos mediante técnicas de compostaje casera, comunitaria e industrial a pequeña escala.",
+      fullDescription:
+        "El programa de Compostaje de la Fundación Calidad tiene como objetivo reducir la cantidad de residuos orgánicos que llegan a los vertederos, transformándolos en un recurso valioso para la agricultura y el jardín. Mediante talleres, jornadas prácticas y acompañamiento técnico, enseñamos a comunidades, hogares y establecimientos a separar y procesar sus residuos orgánicos de manera eficiente. El compost resultante se utiliza para enriquecer suelos degradados, mejorar la retención de agua y disminuir la dependencia de fertilizantes químicos. Este proyecto también contribuye a la reducción de gases de efecto invernadero generados por la descomposición anaeróbica de residuos orgánicos en rellenos sanitarios.",
+      objectives: [
+        "Reducir al menos un 40% los residuos orgánicos enviados a vertederos.",
+        "Enseñar técnicas de compostaje casero y comunitario a familias.",
+        "Producir compost de calidad para huertos y zonas verdes municipales.",
+        "Sensibilizar sobre la importancia de la separación en la fuente.",
+        "Generar alternativas económicas de manejo de residuos.",
+      ],
+      activities: [
+        "Talleres de compostaje en escuelas y centros comunitarios.",
+        "Instalación de composteros domésticos y comunitarios.",
+        "Jornadas de sensibilización sobre separación de residuos.",
+        "Producción y distribución de compost a huertos comunitarios.",
+        "Seguimiento técnico y acompañamiento a familias participantes.",
+      ],
+      impact:
+        "Se han instalado más de 50 composteros en hogares y centros comunitarios, logrando la transformación de toneladas de residuos orgánicos en abono de alta calidad.",
+    },
+  },
+  {
+    id: "permacultura",
+    slug: "permacultura",
+    title: "Permacultura",
+    description:
+      "Diseño de sistemas productivos sostenibles que integran seres humanos, tierra y recursos de forma armónica con el entorno natural.",
+    image: projectRestoration,
+    detailPath: "/proyectos/permacultura",
+    gallery: [
+      {
+        src: projectPermacultura1,
+        alt: "Jardín de permacultura con huerto y vivienda sostenible",
+      },
+      {
+        src: projectPermacultura2,
+        alt: "Bancales elevados para cultivo de alimentos",
+      },
+      {
+        src: projectPermacultura3,
+        alt: "Sendero entre cultivos agroforestales y bosque",
+      },
+      {
+        src: projectPermacultura4,
+        alt: "Huerta orgánica en finca agroecológica",
+      },
+    ],
+    detail: {
+      heroTitle: "Permacultura",
+      summary:
+        "Implementación de huertos, jardines y sistemas agroecológicos basados en los principios de permacultura para comunidades rurales y urbanas.",
+      fullDescription:
+        "El proyecto de Permacultura de la Fundación Calidad busca transformar la relación de las comunidades con la tierra mediante el diseño consciente de espacios productivos sostenibles. A través de la implementación de huertos agroecológicos, jardines de vivienda y sistemas integrados de producción de alimentos, promovemos la soberanía alimentaria y el cuidado del suelo. Nuestro enfoque se basa en los tres éticos de la permacultura: cuidado de la tierra, cuidado de las personas y reparto justo de los excedentes. Trabajamos con comunidades rurales y urbanas para adaptar estos principios a las condiciones locales del territorio colombiano, con especial énfasis en el piedemonte llanero donde se ubica la Fundación, en Villavicencio (Meta).",
+      objectives: [
+        "Diseñar e implementar huertos agroecológicos en escuelas y comunidades.",
+        "Capacitar familias en técnicas de permacultura adaptadas al clima local.",
+        "Promover la producción de alimentos sin agroquímicos.",
+        "Reducir la huella de carbono mediante agricultura regenerativa.",
+        "Crear redes de intercambio de semillas y conocimientos ancestrales.",
+      ],
+      activities: [
+        "Talleres prácticos de diseño de huertos en espiral, bancales y policultivos.",
+        "Jornadas de siembra comunitaria con especies nativas y criollas.",
+        "Instalación de sistemas de captación y almacenamiento de agua lluvia.",
+        "Formación de multiplicadores comunitarios en permacultura.",
+        "Elaboración de compost y abonos orgánicos a partir de residuos locales.",
+      ],
+      impact:
+        "Se han establecido más de 15 huertos agroecológicos en comunidades del territorio, beneficiando a más de 200 familias con acceso a alimentos frescos y orgánicos.",
     },
   },
 ];
@@ -326,6 +332,85 @@ export const stats = [
   { label: "Personas beneficiadas", value: "600+" },
   { label: "Jornadas ambientales", value: "8" },
   { label: "Área natural de la finca (m²)", value: "90.000" },
+];
+
+export interface MetalProduct {
+  id: string;
+  name: string;
+  model?: string;
+  description: string;
+  gallery: { src: string; alt: string }[];
+}
+
+/**
+ * PRODUCTOS METALMECÁNICOS — Fundación Calidad
+ * -------------------------------------------------
+ * Lista editable de productos con su galería de imágenes. Las imágenes
+ * actuales son provisionales y se reemplazan simplemente cambiando la
+ * ruta de cada import o agregando una fotografía nueva en src/assets.
+ */
+export const metalProducts: MetalProduct[] = [
+  {
+    id: "asador",
+    name: "El asador",
+    model: "TRIPAG 01 80 FNB",
+    description:
+      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
+    gallery: [
+      {
+        src: projectMtb,
+        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
+      },
+      {
+        src: projectMtb2,
+        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
+      },
+      {
+        src: projectMtb3,
+        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
+      },
+    ],
+  },
+  {
+    id: "remolque-trituradora",
+    name: "El remolque con la Trituradora Tritupag",
+    description:
+      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
+    gallery: [
+      {
+        src: projectSenderismo2,
+        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
+      },
+      {
+        src: projectMtb4,
+        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
+      },
+      {
+        src: projectMtb1,
+        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
+      },
+    ],
+  },
+  {
+    id: "cortadora-cesped",
+    name: "La cortadora de césped",
+    description:
+      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
+    gallery: [
+      {
+        src: projectCompota,
+        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
+      },
+      {
+        src: projectCompostaje1,
+        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
+      },
+      {
+        src: projectSenderismo3,
+        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
+      },
+    ],
+  },
 ];
 
 /** PROVISIONAL: reemplazar por los datos oficiales de la Fundación. */
