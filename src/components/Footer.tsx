@@ -1,4 +1,4 @@
-import { Facebook, Heart, Instagram } from "lucide-react";
+import { Facebook, Heart, Instagram, Mail } from "lucide-react";
 import logo from "@/assets/logo-fundacion-circular.png";
 import { contact, donation, navLinks, projects } from "@/content/site";
 
@@ -56,11 +56,20 @@ export function Footer() {
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wider">Contacto</h2>
           <ul className="mt-4 space-y-2.5 text-sm text-primary-foreground/75">
-            <li>{contact.email}</li>
+            <li>
+              <a
+                href={contact.gmail.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary-foreground"
+              >
+                {contact.email}
+              </a>
+            </li>
             <li>{contact.phone}</li>
             <li>{contact.address}</li>
           </ul>
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-4">
             <a
               href={donation.pagePath}
               className="inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary"
@@ -68,6 +77,8 @@ export function Footer() {
               <Heart className="h-3.5 w-3.5" />
               Donar
             </a>
+          </div>
+          <div className="mt-2.5 flex flex-wrap gap-2">
             {contact.social.map((s) => {
               const Icon = socialIcons[s.label] ?? Instagram;
               return (
@@ -84,6 +95,17 @@ export function Footer() {
                 </a>
               );
             })}
+            <a
+              key="gmail"
+              href={contact.gmail.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={contact.gmail.label}
+              className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 px-4 py-2 text-xs font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/15 hover:text-primary-foreground"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              {contact.gmail.label}
+            </a>
           </div>
         </div>
       </div>

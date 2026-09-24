@@ -9,6 +9,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { projects } from "@/content/site";
+import { cn } from "@/lib/utils";
 
 export function Projects() {
   return (
@@ -31,12 +32,17 @@ export function Projects() {
                   className="basis-full pl-4 sm:basis-1/2 lg:basis-1/3"
                 >
                   <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lift">
-                    <div className="relative aspect-[4/3] overflow-hidden">
+                    <div
+                      className={cn("relative aspect-[4/3] overflow-hidden", project.imageAspect)}
+                    >
                       <img
                         src={project.image}
                         alt={project.title}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        className={cn(
+                          "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
+                          project.imagePosition ?? "object-center",
+                        )}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
                     </div>

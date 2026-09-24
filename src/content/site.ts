@@ -13,11 +13,12 @@ import projectPermacultura3 from "@/assets/project-permacultura-3.jpg";
 import projectPermacultura4 from "@/assets/project-permacultura-4.jpg";
 import projectCompota from "@/assets/project-composta.png";
 import projectCompostaje1 from "@/assets/project-compostaje-1.jpg";
-import projectCompostaje2 from "@/assets/project-compostaje-2.jpg";
-import projectCompostaje3 from "@/assets/project-compostaje-3.jpg";
-import projectCompostaje4 from "@/assets/project-compostaje-4.jpg";
-import projectFauna from "@/assets/project-fauna.jpg";
+import projectFauna from "@/assets/project-fauna-portada.jpeg";
 import projectFaunaTiti from "@/assets/project-fauna-titi.jpg";
+import projectCompostajeNuevo1 from "@/assets/project-compostaje-nuevo-1.jpeg";
+import projectCompostajeNuevo2 from "@/assets/project-compostaje-nuevo-2.jpeg";
+import projectCompostajeNuevo3 from "@/assets/project-compostaje-nuevo-3.jpeg";
+import projectCompostajeNuevo4 from "@/assets/project-compostaje-nuevo-4.jpeg";
 import projectSenderismo2 from "@/assets/project-senderismo-2.jpg";
 import projectSenderismo3 from "@/assets/project-senderismo-3.jpg";
 import projectMtb from "@/assets/project-mtb.jpg";
@@ -36,6 +37,7 @@ import projectSenderismoNuevo3 from "@/assets/project-senderismo-nuevo-3.jpeg";
 import projectSenderismoNuevo4 from "@/assets/project-senderismo-nuevo-4.jpeg";
 import projectSenderismoNuevo5 from "@/assets/project-senderismo-nuevo-5.jpeg";
 import projectSenderismoNuevo6 from "@/assets/project-senderismo-nuevo-6.jpeg";
+import videoProyectoFauna from "@/assets/video-avistamiento-fauna.mp4";
 
 export const org = {
   name: "Fundación Calidad",
@@ -58,9 +60,16 @@ export interface Project {
   title: string;
   description: string;
   image: string;
+  imageAspect?: string;
+  imagePosition?: string;
   detailPath: string;
-  gallery?: { src: string; alt: string }[];
-  video?: { youtubeId: string; title: string };
+  gallery?: {
+    src: string;
+    alt: string;
+    objectAspect?: string;
+    objectPosition?: string;
+  }[];
+  video?: { youtubeId?: string; src?: string; title: string };
   detail: {
     heroTitle: string;
     summary: string;
@@ -79,6 +88,7 @@ export const projects: Project[] = [
     description:
       "El MTB es una disciplina emocionante que se practica off-road por trochas y senderos montañosos. Nuestra Pista 'Eliana Caicedo' combina downhill, peraltes, switchbacks y obstáculos naturales.",
     image: projectMtb,
+    imageAspect: "aspect-video",
     detailPath: "/proyectos/pista-eliana-caicedo",
     gallery: [
       {
@@ -157,6 +167,7 @@ export const projects: Project[] = [
     description:
       "Recorridos a pie por los senderos ecológicos del piedemonte llanero que combinan deporte, naturaleza y educación ambiental, aptos para todas las edades.",
     image: projectSenderismoNuevo1,
+    imageAspect: "aspect-video",
     detailPath: "/proyectos/senderismo",
     gallery: [
       {
@@ -215,11 +226,18 @@ export const projects: Project[] = [
     description:
       "Caminatas de avistamiento y exploración por la reserva natural de la Fundación para observar la biodiversidad del piedemonte llanero en su estado más puro.",
     image: projectFauna,
+    imageAspect: "aspect-video",
+    imagePosition: "object-top",
     detailPath: "/proyectos/avistamiento-de-fauna",
     gallery: [
       {
         src: projectFaunaTiti,
         alt: "Mono tití, una de las especies más fáciles de observar en el piedemonte llanero",
+      },
+      {
+        src: projectFauna,
+        objectAspect: "aspect-video",
+        alt: "Portada de la reserva natural de la Fundación para el avistamiento de fauna",
       },
       {
         src: projectSenderismoNuevo1,
@@ -234,6 +252,10 @@ export const projects: Project[] = [
         alt: "Guía con turistas conectando con la flora y fauna de la Fundación",
       },
     ],
+    video: {
+      src: videoProyectoFauna,
+      title: "Avistamiento de aves",
+    },
     detail: {
       heroTitle: "Avistamiento de fauna",
       summary:
@@ -265,23 +287,24 @@ export const projects: Project[] = [
     description:
       "Transformación de residuos orgánicos en abono natural para mejorar la salud del suelo y reducir la cantidad de desechos en vertederos.",
     image: projectCompota,
+    imageAspect: "aspect-video",
     detailPath: "/proyectos/compostaje",
     gallery: [
       {
-        src: projectCompostaje1,
-        alt: "Sistema de compostaje casero en el hogar",
+        src: projectCompostajeNuevo1,
+        alt: "Sistema de compostaje de la Fundación transformando residuos orgánicos",
       },
       {
-        src: projectCompostaje2,
-        alt: "Pila de compost en proceso de descomposición",
+        src: projectCompostajeNuevo2,
+        alt: "Cama de compost en proceso de descomposición en la Fundación",
       },
       {
-        src: projectCompostaje3,
-        alt: "Recipiente de lombricomposta con material orgánico",
+        src: projectCompostajeNuevo3,
+        alt: "Manejo del material orgánico para el compostaje",
       },
       {
-        src: projectCompostaje4,
-        alt: "Recipiente de residuos orgánicos para compostaje",
+        src: projectCompostajeNuevo4,
+        alt: "Pila de compost y herramientas utilizadas por la Fundación",
       },
     ],
     detail: {
@@ -315,6 +338,7 @@ export const projects: Project[] = [
     description:
       "Diseño de sistemas productivos sostenibles que integran seres humanos, tierra y recursos de forma armónica con el entorno natural.",
     image: projectRestoration,
+    imageAspect: "aspect-video",
     detailPath: "/proyectos/permacultura",
     gallery: [
       {
@@ -448,9 +472,16 @@ export const metalProducts: MetalProduct[] = [
 
 /** PROVISIONAL: reemplazar por los datos oficiales de la Fundación. */
 export const contact = {
-  email: "fundacioncalidad.org@gmail.com",
+  email: "fundacioncalidad.org2026@gmail.com",
   phone: "+57 322 359 8898",
   address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
+  /**
+   * Gmail — abre Gmail con un correo nuevo dirigido a la Fundación.
+   */
+  gmail: {
+    href: "https://mail.google.com/mail/?view=cm&fs=1&to=fundacioncalidad.org2026@gmail.com",
+    label: "Gmail",
+  },
   /**
    * WhatsApp — PROVISIONAL: reemplazar por el número real.
    * Formato: https://wa.me/<codigo_pais><numero>?text=<mensaje%20prellenado>
@@ -501,7 +532,7 @@ export const donation = {
       description:
         "Dona desde cualquier país del mundo con PayPal: saldo de PayPal, tarjetas de crédito o débito internacionales y pagos en distintas divisas. Ideal para donantes fuera de Colombia.",
       reference: "PENDIENTE: correo de PayPal",
-      placeholder: "Ej: donaciones@fundacioncalidad.org",
+      placeholder: "Ej: donaciones@fundacioncalidad.org2026",
       link: "https://www.paypal.com/donate",
     },
   ],

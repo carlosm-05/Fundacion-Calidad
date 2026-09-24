@@ -120,7 +120,14 @@ export function Contact() {
                 <Mail className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
                 <span>
                   <span className="block font-semibold">Correo oficial</span>
-                  <span className="text-primary-foreground/80">{contact.email}</span>
+                  <a
+                    href={contact.gmail.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-primary-foreground/80 underline decoration-primary-foreground/40 underline-offset-4 transition-colors hover:text-primary-foreground hover:decoration-primary-foreground"
+                  >
+                    {contact.email}
+                  </a>
                 </span>
               </li>
               <li className="flex gap-3">
@@ -158,6 +165,17 @@ export function Contact() {
                         </a>
                       );
                     })}
+                    <a
+                      key="gmail"
+                      href={contact.gmail.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={contact.gmail.label}
+                      className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 px-4 py-2 text-xs font-medium text-primary-foreground/80 transition-colors hover:bg-primary-foreground/15 hover:text-primary-foreground"
+                    >
+                      <Mail className="h-4 w-4" aria-hidden="true" />
+                      {contact.gmail.label}
+                    </a>
                   </span>
                 </span>
               </li>

@@ -65,8 +65,17 @@ function ProjectGallery({ images }: { images: { src: string; alt: string }[] }) 
           <CarouselContent>
             {images.map((item) => (
               <CarouselItem key={item.src}>
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <img src={item.src} alt={item.alt} className="h-full w-full object-cover" />
+                <div
+                  className={cn("relative aspect-[4/3] w-full overflow-hidden", item.objectAspect)}
+                >
+                  <img
+                    src={item.src}
+                    alt={item.alt}
+                    className={cn(
+                      "h-full w-full object-cover",
+                      item.objectPosition ?? "object-center",
+                    )}
+                  />
                 </div>
                 <div className="p-4">
                   <p className="text-xs leading-relaxed text-muted-foreground">{item.alt}</p>
@@ -95,7 +104,14 @@ function ProjectGallery({ images }: { images: { src: string; alt: string }[] }) 
                 : "border-transparent opacity-60 hover:opacity-100",
             )}
           >
-            <img src={item.src} alt={item.alt} className="h-16 w-24 object-cover sm:h-20 sm:w-32" />
+            <img
+              src={item.src}
+              alt={item.alt}
+              className={cn(
+                "h-16 w-24 object-cover sm:h-20 sm:w-32",
+                item.objectPosition ?? "object-center",
+              )}
+            />
           </button>
         ))}
       </div>
@@ -103,19 +119,35 @@ function ProjectGallery({ images }: { images: { src: string; alt: string }[] }) 
   );
 }
 
-function ProjectVideo({ youtubeId, title }: { youtubeId: string; title: string }) {
+function ProjectVideo({ video }: { video: { youtubeId?: string; src?: string; title: string } }) {
   const [playing, setPlaying] = useState(false);
-  const thumbnail = `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg`;
+  const { youtubeId } = video;
+  const thumbnail = youtubeId ? `https://i.ytimg.com/vi/${youtubeId}/maxresdefault.jpg` : "";
+
+  if (video.src) {
+    return (
+      <div>
+        <h2 className="font-display text-2xl font-bold text-foreground">{video.title}</h2>
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-black shadow-soft">
+          <video src={video.src} controls preload="metadata" className="aspect-video w-full">
+            Tu navegador no soporta la reproducción de video.
+          </video>
+        </div>
+      </div>
+    );
+  }
+
+  if (!youtubeId) return null;
 
   return (
     <div>
-      <h2 className="font-display text-2xl font-bold text-foreground">{title}</h2>
+      <h2 className="font-display text-2xl font-bold text-foreground">{video.title}</h2>
       <div className="relative mt-4 aspect-video w-full overflow-hidden rounded-2xl border border-border bg-black shadow-soft">
         {playing ? (
           <iframe
             className="absolute inset-0 h-full w-full"
             src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1`}
-            title={title}
+            title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             referrerPolicy="strict-origin-when-cross-origin"
@@ -124,7 +156,7 @@ function ProjectVideo({ youtubeId, title }: { youtubeId: string; title: string }
           <button
             type="button"
             onClick={() => setPlaying(true)}
-            aria-label={`Reproducir video: ${title}`}
+            aria-label={`Reproducir video: ${video.title}`}
             className="group absolute inset-0 h-full w-full"
           >
             <img
@@ -186,7 +218,11 @@ function ProjectDetail() {
       <main>
         {/* Hero */}
         <section className="relative h-[50vh] min-h-[360px] overflow-hidden">
-          <img src={project.image} alt={project.title} className="h-full w-full object-cover" />
+          <img
+            src={project.image}
+            alt={project.title}
+            className={cn("h-full w-full object-cover", project.imagePosition ?? "object-center")}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/40 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 px-5 pb-10 lg:px-8">
             <div className="mx-auto max-w-7xl">
@@ -224,7 +260,7 @@ function ProjectDetail() {
 
                 {project.video ? (
                   <Reveal>
-                    <ProjectVideo youtubeId={project.video.youtubeId} title={project.video.title} />
+                    <ProjectVideo video={project.video} />
                   </Reveal>
                 ) : null}
 
