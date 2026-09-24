@@ -18,19 +18,24 @@ import projectCompostaje3 from "@/assets/project-compostaje-3.jpg";
 import projectCompostaje4 from "@/assets/project-compostaje-4.jpg";
 import projectFauna from "@/assets/project-fauna.jpg";
 import projectFaunaTiti from "@/assets/project-fauna-titi.jpg";
-import projectFaunaTucan from "@/assets/project-fauna-tucan.jpg";
-import projectFaunaGuacamaya from "@/assets/project-fauna-guacamaya.jpg";
-import projectFaunaGarza from "@/assets/project-fauna-garza.jpg";
-import projectSenderismo from "@/assets/project-senderismo.jpg";
 import projectSenderismo2 from "@/assets/project-senderismo-2.jpg";
 import projectSenderismo3 from "@/assets/project-senderismo-3.jpg";
-import projectSenderismo4 from "@/assets/project-senderismo-4.jpg";
-import projectSenderismo5 from "@/assets/project-senderismo-5.jpg";
 import projectMtb from "@/assets/project-mtb.jpg";
 import projectMtb1 from "@/assets/project-mtb-pista-1.jpeg";
 import projectMtb2 from "@/assets/project-mtb-pista-2.jpeg";
 import projectMtb3 from "@/assets/project-mtb-pista-3.jpeg";
 import projectMtb4 from "@/assets/project-mtb-pista-4.jpeg";
+import projectMtb6 from "@/assets/project-mtb-pista-6.jpeg";
+import projectMtb7 from "@/assets/project-mtb-pista-7.jpeg";
+import projectMtb8 from "@/assets/project-mtb-pista-8.jpeg";
+import projectMtb9 from "@/assets/project-mtb-pista-9.jpeg";
+import projectMtb10 from "@/assets/project-mtb-pista-10.jpeg";
+import projectSenderismoNuevo1 from "@/assets/project-senderismo-nuevo-1.jpeg";
+import projectSenderismoNuevo2 from "@/assets/project-senderismo-nuevo-2.jpeg";
+import projectSenderismoNuevo3 from "@/assets/project-senderismo-nuevo-3.jpeg";
+import projectSenderismoNuevo4 from "@/assets/project-senderismo-nuevo-4.jpeg";
+import projectSenderismoNuevo5 from "@/assets/project-senderismo-nuevo-5.jpeg";
+import projectSenderismoNuevo6 from "@/assets/project-senderismo-nuevo-6.jpeg";
 
 export const org = {
   name: "Fundación Calidad",
@@ -56,7 +61,6 @@ export interface Project {
   detailPath: string;
   gallery?: { src: string; alt: string }[];
   video?: { youtubeId: string; title: string };
-  instagram?: { postUrl: string; title: string };
   detail: {
     heroTitle: string;
     summary: string;
@@ -93,14 +97,34 @@ export const projects: Project[] = [
         src: projectMtb4,
         alt: "Puentes, puntos de control de la carrera",
       },
+      {
+        src: projectMtb6,
+        alt: "Guías y turistas recorriendo la pista de MTB en la Fundación",
+      },
+      {
+        src: projectMtb7,
+        alt: "Guías y turistas en el circuito de MTB de la Fundación",
+      },
+      {
+        src: projectMtb8,
+        alt: "Guías y turistas disfrutando del entorno natural de la pista de MTB",
+      },
+      {
+        src: projectMtb9,
+        alt: "Guías y turistas explorando la pista de MTB",
+      },
+      {
+        src: projectMtb10,
+        alt: "Guías y turistas en la pista de MTB de la Fundación",
+      },
+      {
+        src: projectMtb,
+        alt: "Portada de la Pista para MTB Eliana Caicedo",
+      },
     ],
     video: {
       youtubeId: "02eTYR0R96c",
       title: "Recorrido de la Pista para MTB",
-    },
-    instagram: {
-      postUrl: "https://www.instagram.com/p/Ck-943IL2P1/",
-      title: "Eliana Caicedo, campeona mundial de MTB",
     },
     detail: {
       heroTitle: "Pista para MTB",
@@ -132,28 +156,32 @@ export const projects: Project[] = [
     title: "Senderismo",
     description:
       "Recorridos a pie por los senderos ecológicos del piedemonte llanero que combinan deporte, naturaleza y educación ambiental, aptos para todas las edades.",
-    image: projectSenderismo,
+    image: projectSenderismoNuevo1,
     detailPath: "/proyectos/senderismo",
     gallery: [
       {
-        src: projectSenderismo,
-        alt: "Sendero ecológico entre bosque y vegetación nativa",
+        src: projectSenderismoNuevo1,
+        alt: "Guía con turistas recorriendo los senderos de la Fundación",
       },
       {
-        src: projectSenderismo2,
-        alt: "Camino de senderismo a través del bosque",
+        src: projectSenderismoNuevo2,
+        alt: "Guía con turistas observando la flora del sendero",
       },
       {
-        src: projectSenderismo3,
-        alt: "Caminante con morral recorriendo la montaña",
+        src: projectSenderismoNuevo3,
+        alt: "Guía con turistas en la naturaleza de la Fundación",
       },
       {
-        src: projectSenderismo4,
-        alt: "Cascada en medio de la selva y el bosque",
+        src: projectSenderismoNuevo4,
+        alt: "Guía con turistas recorriendo el piedemonte llanero",
       },
       {
-        src: projectSenderismo5,
-        alt: "Bosque de niebla y montaña en el trópico",
+        src: projectSenderismoNuevo5,
+        alt: "Turistas disfrutando de la caminata ecológica",
+      },
+      {
+        src: projectSenderismoNuevo6,
+        alt: "Guía con turistas conectando con el entorno natural",
       },
     ],
     detail: {
@@ -194,16 +222,16 @@ export const projects: Project[] = [
         alt: "Mono tití, una de las especies más fáciles de observar en el piedemonte llanero",
       },
       {
-        src: projectFaunaTucan,
-        alt: "Tucán pico irís, ave emblemática de los bosques del Meta",
+        src: projectSenderismoNuevo1,
+        alt: "Guía con turistas observando la fauna del piedemonte llanero",
       },
       {
-        src: projectFaunaGuacamaya,
-        alt: "Guacamayas, aves coloridas de la Orinoquía colombiana",
+        src: projectSenderismoNuevo2,
+        alt: "Guía con turistas explorando la reserva natural de la Fundación",
       },
       {
-        src: projectFaunaGarza,
-        alt: "Garza pescando en un humedal del piedemonte llanero",
+        src: projectSenderismoNuevo3,
+        alt: "Guía con turistas conectando con la flora y fauna de la Fundación",
       },
     ],
     detail: {
@@ -420,15 +448,15 @@ export const metalProducts: MetalProduct[] = [
 
 /** PROVISIONAL: reemplazar por los datos oficiales de la Fundación. */
 export const contact = {
-  email: "correo@ejemplo.org",
-  phone: "+57 000 000 0000",
+  email: "fundacioncalidad.org@gmail.com",
+  phone: "+57 322 359 8898",
   address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
   /**
    * WhatsApp — PROVISIONAL: reemplazar por el número real.
    * Formato: https://wa.me/<codigo_pais><numero>?text=<mensaje%20prellenado>
    */
   whatsapp: {
-    href: "https://wa.me/573000000000?text=Hola%20Fundaci%C3%B3n%20Calidad%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n.",
+    href: "https://wa.me/573223598898?text=Hola%20Fundaci%C3%B3n%20Calidad%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n.",
     label: "Escríbenos por WhatsApp",
   },
   social: [
