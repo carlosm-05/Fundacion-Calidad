@@ -31,7 +31,7 @@ import projectMtb7 from "@/assets/project-mtb-pista-7.jpeg";
 import projectMtb8 from "@/assets/project-mtb-pista-8.jpeg";
 import projectMtb9 from "@/assets/project-mtb-pista-9.jpeg";
 import projectMtb10 from "@/assets/project-mtb-pista-10.jpeg";
-import projectSenderismoNuevo1 from "@/assets/project-senderismo-nuevo-1.jpeg";
+import projectSenderismoPortada from "@/assets/project-senderismo-portada.jpeg";
 import projectSenderismoNuevo2 from "@/assets/project-senderismo-nuevo-2.jpeg";
 import projectSenderismoNuevo3 from "@/assets/project-senderismo-nuevo-3.jpeg";
 import projectSenderismoNuevo4 from "@/assets/project-senderismo-nuevo-4.jpeg";
@@ -166,14 +166,18 @@ export const projects: Project[] = [
     title: "Senderismo",
     description:
       "Recorridos a pie por los senderos ecológicos del piedemonte llanero que combinan deporte, naturaleza y educación ambiental, aptos para todas las edades.",
-    image: projectSenderismoNuevo1,
+    image: projectSenderismoPortada,
     imageAspect: "aspect-video",
+    /**
+     * Desplaza el encuadre hacia arriba y a la izquierda para que el logo de la
+     * esquina superior de la foto no quede recortado. `object-position` en
+     * porcentaje: 50% 50% es el centro (valor por defecto de `object-cover`),
+     * 0% 0% muestra exactamente la esquina superior izquierda. Sube este valor
+     * hacia 0 si el logo sigue cortado.
+     */
+    imagePosition: "object-[30%_20%]",
     detailPath: "/proyectos/senderismo",
     gallery: [
-      {
-        src: projectSenderismoNuevo1,
-        alt: "Guía con turistas recorriendo los senderos de la Fundación",
-      },
       {
         src: projectSenderismoNuevo2,
         alt: "Guía con turistas observando la flora del sendero",
@@ -238,10 +242,6 @@ export const projects: Project[] = [
         src: projectFauna,
         objectAspect: "aspect-video",
         alt: "Portada de la reserva natural de la Fundación para el avistamiento de fauna",
-      },
-      {
-        src: projectSenderismoNuevo1,
-        alt: "Guía con turistas observando la fauna del piedemonte llanero",
       },
       {
         src: projectSenderismoNuevo2,
@@ -500,6 +500,52 @@ export const contact = {
       href: "https://www.facebook.com/people/Fundacion-Calidadorg/100081206269536/",
     },
   ],
+};
+
+/**
+ * UBICACIÓN — Fundación Calidad
+ * -------------------------------------------------
+ * Coordenadas y enlaces de Google Maps. Los tres URLs que se derivan de aquí
+ * usan el formato oficial de "Google Maps URLs" (api=1) y el iframe usa el
+ * "share embed" de Google Maps: ninguno requiere API key ni tarjeta de crédito.
+ *
+ * Para actualizar la ubicación: cambia `lat`, `lng` y `placeId` por los del
+ * lugar en Google Maps (el Place ID aparece en el enlace como `1s0x...:0x...`,
+ * o en Google Maps > Compartir > Copiar enlace).
+ */
+const lat = 4.0937687;
+const lng = -73.6677213;
+const placeId = "0x8e3e31c9b77fad2f:0xd76b783c0a1a67be";
+const coordinates = `${lat},${lng}`;
+
+export const location = {
+  address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
+  lat,
+  lng,
+  placeId,
+  zoom: 15,
+  /**
+   * "Cómo llegar" — abre la app de Google Maps en Android/iOS y Maps web en
+   * escritorio. Sin `origin` porque el punto de partida por defecto es la
+   * ubicación del dispositivo.
+   */
+  directionsUrl: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+    coordinates,
+  )}&travelmode=driving`,
+  /**
+   * Abre el lugar en Google Maps. Se usa el Place ID para asegurar que apunte
+   * a la Fundación y no a un punto cercano con nombre parecido.
+   */
+  placeUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    coordinates,
+  )}&query_place_id=${encodeURIComponent(placeId)}`,
+  /** Enlace corto para compartir. */
+  shareUrl: "https://maps.app.goo.gl/11scfnvt7h",
+  /**
+   * Mapa embebido: mismo iframe que genera Google Maps en
+   * Compartir > Insertar un mapa. `output=embed` no necesita API key.
+   */
+  embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(coordinates)}&z=15&hl=es&output=embed`,
 };
 
 /**

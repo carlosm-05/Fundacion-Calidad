@@ -1,4 +1,5 @@
 import aboutImage from "@/assets/about-community.jpg";
+import { LocationMap } from "@/components/LocationMap";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -39,6 +40,8 @@ export function About() {
             </div>
           </Reveal>
         </div>
+
+        <LocationMap />
       </div>
     </section>
   );
