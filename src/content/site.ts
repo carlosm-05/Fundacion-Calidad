@@ -166,13 +166,13 @@ export const projects: Project[] = [
     image: projectSenderismoPortada,
     imageAspect: "aspect-video",
     /**
-     * Desplaza el encuadre hacia arriba y a la izquierda para que el logo de la
-     * esquina superior de la foto no quede recortado. `object-position` en
-     * porcentaje: 50% 50% es el centro (valor por defecto de `object-cover`),
-     * 0% 0% muestra exactamente la esquina superior izquierda. Sube este valor
-     * hacia 0 si el logo sigue cortado.
+     * La portada es 3:2 (900x600) y la tarjeta la recorta a 16:9, así que
+     * `object-cover` descarta ~94px de alto. `object-top` deja el recorte
+     * entero abajo y muestra el borde superior completo, que es donde va el
+     * logo de la Fundación. El eje horizontal no se recorta (3:2 es más
+     * angosto que 16:9), por eso no lleva valor en X.
      */
-    imagePosition: "object-[30%_20%]",
+    imagePosition: "object-top",
     detailPath: "/proyectos/senderismo",
     gallery: [
       {
