@@ -1,4 +1,4 @@
-import aboutImage from "@/assets/about-community.jpg";
+import aboutImage from "@/assets/about-nosotros.jpeg";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 
@@ -26,11 +26,11 @@ export function About() {
             <div className="relative">
               <img
                 src={aboutImage}
-                alt="Voluntarios sembrando árboles nativos junto a la comunidad"
+                alt="Fotografía de la Fundación Calidad"
                 width={1200}
                 height={900}
                 loading="lazy"
-                className="w-full rounded-3xl object-cover shadow-lift"
+                className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lift"
               />
               <div
                 aria-hidden="true"
