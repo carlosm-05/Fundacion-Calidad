@@ -6,7 +6,7 @@ export function About() {
   return (
     <section id="nosotros" className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="grid items-center gap-14 lg:grid-cols-2">
+        <div className="grid items-start gap-14 lg:grid-cols-2">
           <Reveal className="order-2 lg:order-1">
             <SectionHeading
               align="left"
@@ -27,10 +27,10 @@ export function About() {
               <img
                 src={aboutImage}
                 alt="Fotografía de la Fundación Calidad"
-                width={1200}
-                height={900}
+                width={800}
+                height={800}
                 loading="lazy"
-                className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lift"
+                className="h-auto w-full rounded-3xl shadow-lift"
               />
             </div>
           </Reveal>
