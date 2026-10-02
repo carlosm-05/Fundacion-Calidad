@@ -42,8 +42,8 @@ function Index() {
         <Projects />
         <Impact />
         <CallToAction />
-        <Contact />
         <LocationMap />
+        <Contact />
       </main>
       <Footer />
     </div>
