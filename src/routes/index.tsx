@@ -9,6 +9,7 @@ import { Projects } from "@/components/Projects";
 import { Impact } from "@/components/Impact";
 import { CallToAction } from "@/components/CallToAction";
 import { Contact } from "@/components/Contact";
+import { LocationMap } from "@/components/LocationMap";
 import { Footer } from "@/components/Footer";
 
 const title = "Fundación Calidad | Conservación ambiental y desarrollo sostenible";
@@ -42,6 +43,7 @@ function Index() {
         <Impact />
         <CallToAction />
         <Contact />
+        <LocationMap />
       </main>
       <Footer />
     </div>

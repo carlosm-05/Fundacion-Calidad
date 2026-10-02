@@ -7,6 +7,8 @@ type Props = {
   description?: ReactNode;
   align?: "left" | "center";
   className?: string;
+  titleClassName?: string;
+  descriptionClassName?: string;
 };
 
 export function SectionHeading({
@@ -15,6 +17,8 @@ export function SectionHeading({
   description,
   align = "center",
   className,
+  titleClassName,
+  descriptionClassName,
 }: Props) {
   return (
     <div
@@ -29,9 +33,18 @@ export function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl font-semibold text-primary sm:text-4xl">{title}</h2>
+      <h2 className={cn("text-3xl font-semibold text-primary sm:text-4xl", titleClassName)}>
+        {title}
+      </h2>
       {description ? (
-        <p className="mt-4 text-base leading-relaxed text-muted-foreground">{description}</p>
+        <p
+          className={cn(
+            "mt-4 text-base leading-relaxed text-muted-foreground",
+            descriptionClassName,
+          )}
+        >
+          {description}
+        </p>
       ) : null}
     </div>
   );

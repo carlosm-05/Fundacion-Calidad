@@ -3,7 +3,7 @@ import { ArrowLeft, CheckCircle, Leaf, Play, Target, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { projects } from "@/content/site";
+import { projects, type Project } from "@/content/site";
 import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 import {
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/proyectos/$slug")({
   component: ProjectDetail,
 });
 
-function ProjectGallery({ images }: { images: { src: string; alt: string }[] }) {
+function ProjectGallery({ images }: { images: NonNullable<Project["gallery"]> }) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const total = images.length;
