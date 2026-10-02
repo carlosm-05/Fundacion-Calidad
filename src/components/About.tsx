@@ -32,10 +32,6 @@ export function About() {
                 loading="lazy"
                 className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lift"
               />
-              <div
-                aria-hidden="true"
-                className="absolute -bottom-6 -left-6 hidden h-28 w-28 rounded-3xl bg-leaf/70 sm:block"
-              />
             </div>
           </Reveal>
         </div>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Cog, Pencil } from "lucide-react";
+import { ArrowLeft, Cog } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -53,6 +53,15 @@ function ProductGallery({ images }: { images: { src: string; alt: string }[] }) 
       api.off("select", onSelect);
     };
   }, [api]);
+
+  if (total === 0) {
+    return (
+      <div
+        aria-hidden="true"
+        className="aspect-[4/3] w-full rounded-2xl border border-dashed border-border bg-background"
+      />
+    );
+  }
 
   return (
     <div>
@@ -171,8 +180,7 @@ function MetalmecanicosPage() {
                         ) : null}
                       </div>
                     </div>
-                    <p className="mt-4 flex items-start gap-2 rounded-xl border border-dashed border-secondary/50 bg-secondary/5 px-4 py-3 text-sm leading-relaxed text-foreground/70">
-                      <Pencil className="mt-0.5 h-4 w-4 shrink-0 text-secondary" />
+                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                       {product.description}
                     </p>
                   </div>

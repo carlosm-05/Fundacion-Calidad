@@ -12,16 +12,13 @@ import projectPermacultura2 from "@/assets/project-permacultura-2.jpg";
 import projectPermacultura3 from "@/assets/project-permacultura-3.jpg";
 import projectPermacultura4 from "@/assets/project-permacultura-4.jpg";
 import projectCompota from "@/assets/project-composta.png";
-import projectCompostaje1 from "@/assets/project-compostaje-1.jpg";
 import projectFauna from "@/assets/project-fauna-portada.jpeg";
 import projectFaunaTiti from "@/assets/project-fauna-titi.jpg";
 import projectCompostajeNuevo1 from "@/assets/project-compostaje-nuevo-1.jpeg";
 import projectCompostajeNuevo2 from "@/assets/project-compostaje-nuevo-2.jpeg";
 import projectCompostajeNuevo3 from "@/assets/project-compostaje-nuevo-3.jpeg";
 import projectCompostajeNuevo4 from "@/assets/project-compostaje-nuevo-4.jpeg";
-import projectSenderismo2 from "@/assets/project-senderismo-2.jpg";
-import projectSenderismo3 from "@/assets/project-senderismo-3.jpg";
-import projectMtb from "@/assets/project-mtb.jpg";
+import projectSenderismoPortada from "@/assets/project-senderismo-portada.jpeg";
 import projectMtb1 from "@/assets/project-mtb-pista-1.jpeg";
 import projectMtb2 from "@/assets/project-mtb-pista-2.jpeg";
 import projectMtb3 from "@/assets/project-mtb-pista-3.jpeg";
@@ -402,71 +399,28 @@ export interface MetalProduct {
 /**
  * PRODUCTOS METALMECÁNICOS — Fundación Calidad
  * -------------------------------------------------
- * Lista editable de productos con su galería de imágenes. Las imágenes
- * actuales son provisionales y se reemplazan simplemente cambiando la
- * ruta de cada import o agregando una fotografía nueva en src/assets.
+ * Lista editable de productos. Las galerías están vacías a propósito:
+ * se llenan agregando fotografías en src/assets y con su import aquí.
  */
 export const metalProducts: MetalProduct[] = [
   {
     id: "asador",
     name: "El asador",
     model: "TRIPAG 01 80 FNB",
-    description:
-      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
-    gallery: [
-      {
-        src: projectMtb,
-        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
-      },
-      {
-        src: projectMtb2,
-        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
-      },
-      {
-        src: projectMtb3,
-        alt: "Imagen provisional del asador TRIPAG 01 80 FNB — reemplazar por fotografía real",
-      },
-    ],
+    description: "Fundación Calidad",
+    gallery: [],
   },
   {
     id: "remolque-trituradora",
     name: "El remolque con la Trituradora Tritupag",
-    description:
-      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
-    gallery: [
-      {
-        src: projectSenderismo2,
-        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
-      },
-      {
-        src: projectMtb4,
-        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
-      },
-      {
-        src: projectMtb1,
-        alt: "Imagen provisional del remolque con la Trituradora Tritupag — reemplazar por fotografía real",
-      },
-    ],
+    description: "Fundación Calidad",
+    gallery: [],
   },
   {
     id: "cortadora-cesped",
     name: "La cortadora de césped",
-    description:
-      "Texto editable: complementa aquí la información de este producto (características, materiales, medidas, usos y beneficios).",
-    gallery: [
-      {
-        src: projectCompota,
-        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
-      },
-      {
-        src: projectCompostaje1,
-        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
-      },
-      {
-        src: projectSenderismo3,
-        alt: "Imagen provisional de la cortadora de césped — reemplazar por fotografía real",
-      },
-    ],
+    description: "Fundación Calidad",
+    gallery: [],
   },
 ];
 
