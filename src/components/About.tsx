@@ -6,7 +6,7 @@ export function About() {
   return (
     <section id="nosotros" className="bg-background py-24">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
-        <div className="grid items-start gap-14 lg:grid-cols-2">
+        <div className="grid items-center gap-14 lg:grid-cols-2">
           <Reveal className="order-2 lg:order-1">
             <SectionHeading
               align="left"
