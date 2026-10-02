@@ -18,7 +18,7 @@ import projectCompostajeNuevo1 from "@/assets/project-compostaje-nuevo-1.jpeg";
 import projectCompostajeNuevo2 from "@/assets/project-compostaje-nuevo-2.jpeg";
 import projectCompostajeNuevo3 from "@/assets/project-compostaje-nuevo-3.jpeg";
 import projectCompostajeNuevo4 from "@/assets/project-compostaje-nuevo-4.jpeg";
-import projectSenderismoPortada from "@/assets/project-senderismo-portada.jpeg";
+import projectMtb from "@/assets/project-mtb.jpg";
 import projectMtb1 from "@/assets/project-mtb-pista-1.jpeg";
 import projectMtb2 from "@/assets/project-mtb-pista-2.jpeg";
 import projectMtb3 from "@/assets/project-mtb-pista-3.jpeg";
