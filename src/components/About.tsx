@@ -18,7 +18,7 @@ export function About() {
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
               Articulamos esfuerzos con comunidades, organizaciones y aliados para proteger los
               ecosistemas, fortalecer la cultura ambiental y generar iniciativas sociales con
-              impacto real en el territorio. (Texto institucional provisional, editable).
+              impacto real en el territorio.
             </p>
           </Reveal>
 
