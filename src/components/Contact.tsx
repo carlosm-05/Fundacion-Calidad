@@ -4,6 +4,7 @@ import { ActionButton } from "@/components/ui/action-button";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { contact } from "@/content/site";
+import { sendContactMessage } from "@/lib/contact-server";
 
 const socialIcons: Record<string, typeof Instagram> = {
   Instagram,
@@ -13,13 +14,38 @@ const socialIcons: Record<string, typeof Instagram> = {
 const fieldClass =
   "w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-secondary focus:outline-none";
 
-export function Contact() {
-  const [sent, setSent] = useState(false);
+type Status = "idle" | "sending" | "success" | "error" | "config";
 
-  // El formulario está preparado para conectarse luego a un servicio de envío.
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+export function Contact() {
+  const [status, setStatus] = useState<Status>("idle");
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSent(true);
+    if (status === "sending") return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    setStatus("sending");
+
+    try {
+      const result = await sendContactMessage({
+        data: {
+          nombre: String(formData.get("nombre") ?? ""),
+          correo: String(formData.get("correo") ?? ""),
+          telefono: String(formData.get("telefono") ?? ""),
+          mensaje: String(formData.get("mensaje") ?? ""),
+        },
+      });
+
+      if (result.ok) {
+        setStatus("success");
+        form.reset();
+      } else {
+        setStatus(result.error === "config" ? "config" : "error");
+      }
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
@@ -96,11 +122,34 @@ export function Contact() {
               </div>
 
               <div className="flex flex-wrap items-center gap-4">
-                <ActionButton type="submit">Enviar mensaje</ActionButton>
-                <p aria-live="polite" className="text-sm text-muted-foreground">
-                  {sent
-                    ? "Gracias por escribirnos. El envío se activará al conectar el servicio de correo."
-                    : ""}
+                <ActionButton type="submit" disabled={status === "sending"}>
+                  {status === "sending" ? "Enviando…" : "Enviar mensaje"}
+                </ActionButton>
+                <p aria-live="polite" className="text-sm">
+                  {status === "success" ? (
+                    <span className="text-secondary">
+                      ¡Gracias! Tu mensaje fue enviado. Pronto nos pondremos en contacto.
+                    </span>
+                  ) : null}
+                  {status === "error" ? (
+                    <span className="text-destructive">
+                      No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos por{" "}
+                      <a
+                        href={contact.whatsapp.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold underline underline-offset-4"
+                      >
+                        WhatsApp
+                      </a>
+                      .
+                    </span>
+                  ) : null}
+                  {status === "config" ? (
+                    <span className="text-muted-foreground">
+                      El envío por correo aún no está configurado en el servidor.
+                    </span>
+                  ) : null}
                 </p>
               </div>
             </form>

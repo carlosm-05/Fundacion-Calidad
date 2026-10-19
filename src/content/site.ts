@@ -47,7 +47,7 @@ export const navLinks = [
   { label: "Inicio", href: "/#inicio" },
   { label: "Nosotros", href: "/#nosotros" },
   { label: "Proyectos", href: "/#proyectos" },
-  { label: "Metalmecánicos", href: "/metalmecanicos" },
+  { label: "Productos y servicios", href: "/productos-servicios" },
   { label: "Contacto", href: "/#contacto" },
 ];
 
@@ -394,6 +394,8 @@ export interface MetalProduct {
   name: string;
   model?: string;
   description: string;
+  /** Precio opcional. Si no se define, se muestra "Solicitar cotización". */
+  price?: string;
   gallery: { src: string; alt: string }[];
 }
 
@@ -402,6 +404,7 @@ export interface MetalProduct {
  * -------------------------------------------------
  * Lista editable de productos. Las galerías están vacías a propósito:
  * se llenan agregando fotografías en src/assets y con su import aquí.
+ * Sin `price` el producto se ofrece bajo cotización.
  */
 export const metalProducts: MetalProduct[] = [
   {
@@ -422,6 +425,38 @@ export const metalProducts: MetalProduct[] = [
     name: "La cortadora de césped",
     description: "Fundación Calidad",
     gallery: [],
+  },
+];
+
+export interface Service {
+  id: string;
+  name: string;
+  description: string;
+  /** Precio opcional. Si no se define, se muestra "Solicitar cotización". */
+  price?: string;
+}
+
+/**
+ * SERVICIOS — Fundación Calidad
+ * -------------------------------------------------
+ * PROVISIONAL: nombres y descripciones de marcador. Reemplace cada entrada
+ * por los servicios reales de la Fundación y agregue `price` cuando exista.
+ */
+export const services: Service[] = [
+  {
+    id: "servicio-1",
+    name: "Servicio 1",
+    description: "Descripción del Servicio 1 (PROVISIONAL).",
+  },
+  {
+    id: "servicio-2",
+    name: "Servicio 2",
+    description: "Descripción del Servicio 2 (PROVISIONAL).",
+  },
+  {
+    id: "servicio-3",
+    name: "Servicio 3",
+    description: "Descripción del Servicio 3 (PROVISIONAL).",
   },
 ];
 
