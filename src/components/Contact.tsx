@@ -160,9 +160,6 @@ export function Contact() {
             className="rounded-3xl bg-primary p-7 text-primary-foreground shadow-lift sm:p-9"
           >
             <h3 className="text-xl font-semibold">Datos de contacto</h3>
-            <p className="mt-2 text-sm text-primary-foreground/70">
-              Información de ejemplo, pendiente de reemplazar por los datos oficiales.
-            </p>
 
             <ul className="mt-7 space-y-5 text-sm">
               <li className="flex gap-3">
