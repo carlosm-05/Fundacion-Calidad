@@ -29,10 +29,21 @@ const contactSchema = z.object({
 export type ContactResult = { ok: true } | { ok: false; error: "config" | "invalid" | "send" };
 
 function env(name: string): string | undefined {
-  const value = (
-    globalThis as { process?: { env?: Record<string, string | undefined> } }
-  ).process?.env?.[name]?.trim();
-  return value ? value : undefined;
+  const runtime = globalThis as {
+    process?: { env?: Record<string, string | undefined> };
+    __RUNTIME_ENV__?: Record<string, unknown>;
+  };
+
+  const fromProcess = runtime.process?.env?.[name]?.trim();
+  if (fromProcess) return fromProcess;
+
+  const binding = runtime.__RUNTIME_ENV__?.[name];
+  if (typeof binding === "string") {
+    const value = binding.trim();
+    if (value) return value;
+  }
+
+  return undefined;
 }
 
 function escapeHtml(value: string): string {
