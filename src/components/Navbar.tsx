@@ -37,7 +37,11 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="rounded-full px-3.5 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-primary"
+              className={cn(
+                "rounded-full px-3.5 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-primary",
+                link.href === "/productos-servicios" &&
+                  "bg-earth/10 font-semibold text-earth ring-1 ring-inset ring-earth/45 hover:bg-earth hover:text-white",
+              )}
             >
               {link.label}
             </a>
@@ -80,7 +84,11 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3 text-sm font-medium text-foreground/85 transition-colors hover:bg-accent hover:text-primary"
+              className={cn(
+                "rounded-lg px-3 py-3 text-sm font-medium text-foreground/85 transition-colors hover:bg-accent hover:text-primary",
+                link.href === "/productos-servicios" &&
+                  "bg-earth/10 font-semibold text-earth ring-1 ring-inset ring-earth/45 hover:bg-earth hover:text-white",
+              )}
             >
               {link.label}
             </a>

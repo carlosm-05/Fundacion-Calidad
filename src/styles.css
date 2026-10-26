@@ -136,6 +136,11 @@
   }
 }
 
+@utility min-h-hero {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
 @utility reveal {
   opacity: 0;
 }

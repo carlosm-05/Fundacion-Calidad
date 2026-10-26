@@ -206,7 +206,7 @@ function ProductosServiciosPage() {
                 <Link
                   to="/"
                   hash="contacto"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-earth px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary"
                 >
                   Contáctanos
                 </Link>

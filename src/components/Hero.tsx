@@ -5,10 +5,7 @@ import { donation, org } from "@/content/site";
 
 export function Hero() {
   return (
-    <section
-      id="inicio"
-      className="relative isolate flex min-h-[92vh] items-center overflow-hidden"
-    >
+    <section id="inicio" className="relative isolate flex min-h-hero items-center overflow-hidden">
       <img
         src={heroImage}
         alt="Bosque de niebla con montañas verdes al amanecer"

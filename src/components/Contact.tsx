@@ -1,6 +1,15 @@
 import { useState, type FormEvent } from "react";
-import { Facebook, Instagram, Mail, MapPin, Phone, Share2 } from "lucide-react";
+import { CheckCircle2, Facebook, Instagram, Mail, MapPin, Phone, Share2 } from "lucide-react";
 import { ActionButton } from "@/components/ui/action-button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { contact } from "@/content/site";
@@ -126,11 +135,6 @@ export function Contact() {
                   {status === "sending" ? "Enviando…" : "Enviar mensaje"}
                 </ActionButton>
                 <p aria-live="polite" className="text-sm">
-                  {status === "success" ? (
-                    <span className="text-secondary">
-                      ¡Gracias! Tu mensaje fue enviado. Pronto nos pondremos en contacto.
-                    </span>
-                  ) : null}
                   {status === "error" ? (
                     <span className="text-destructive">
                       No pudimos enviar tu mensaje. Intenta de nuevo o escríbenos por{" "}
@@ -153,6 +157,33 @@ export function Contact() {
                 </p>
               </div>
             </form>
+
+            <Dialog
+              open={status === "success"}
+              onOpenChange={(open) => {
+                if (!open) setStatus("idle");
+              }}
+            >
+              <DialogContent className="max-w-md rounded-3xl border-border bg-card sm:rounded-3xl">
+                <DialogHeader className="items-center text-center">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary/15">
+                    <CheckCircle2 className="h-7 w-7 text-secondary" aria-hidden="true" />
+                  </div>
+                  <DialogTitle className="mt-2 font-display text-2xl text-primary">
+                    ¡Mensaje enviado!
+                  </DialogTitle>
+                  <DialogDescription className="text-center text-base leading-relaxed">
+                    Gracias por escribirnos. Hemos recibido tu mensaje y pronto nos pondremos en
+                    contacto.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="sm:justify-center">
+                  <DialogClose asChild>
+                    <ActionButton type="button">Cerrar</ActionButton>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </Reveal>
 
           <Reveal
