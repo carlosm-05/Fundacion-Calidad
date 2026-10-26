@@ -40,7 +40,7 @@ export function Navbar() {
               className={cn(
                 "rounded-full px-3.5 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-accent hover:text-primary",
                 link.href === "/productos-servicios" &&
-                  "bg-earth/10 font-semibold text-earth ring-1 ring-inset ring-earth/45 hover:bg-earth hover:text-white",
+                  "bg-primary font-semibold text-primary-foreground hover:bg-secondary hover:text-primary-foreground",
               )}
             >
               {link.label}
@@ -87,7 +87,7 @@ export function Navbar() {
               className={cn(
                 "rounded-lg px-3 py-3 text-sm font-medium text-foreground/85 transition-colors hover:bg-accent hover:text-primary",
                 link.href === "/productos-servicios" &&
-                  "bg-earth/10 font-semibold text-earth ring-1 ring-inset ring-earth/45 hover:bg-earth hover:text-white",
+                  "bg-primary font-semibold text-primary-foreground hover:bg-secondary hover:text-primary-foreground",
               )}
             >
               {link.label}
