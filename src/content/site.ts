@@ -544,32 +544,49 @@ export const location = {
  * Reemplace cada `link` (o nº de cuenta) por la información real de la
  * Fundación. El botón "Donar" lleva a la página /donacion.
  */
+const daviplataReceiver = import.meta.env["VITE_DAVIPLATA_RECEIVER"]?.trim() ?? "";
+const daviplataHolder = import.meta.env["VITE_DAVIPLATA_HOLDER"]?.trim() ?? "";
+const paypalDonationUrl = (() => {
+  const rawUrl = import.meta.env["VITE_PAYPAL_DONATION_URL"]?.trim();
+  if (!rawUrl) return "";
+  try {
+    const url = new URL(rawUrl);
+    const isPayPalHost =
+      url.hostname === "paypal.me" ||
+      url.hostname === "paypal.com" ||
+      url.hostname === "www.paypal.com" ||
+      url.hostname.endsWith(".paypal.com");
+    return url.protocol === "https:" && isPayPalHost ? url.toString() : "";
+  } catch {
+    return "";
+  }
+})();
+
 export const donation = {
   pagePath: "/donacion",
   banner:
     "Tu apoyo es fundamental para seguir impulsando proyectos ambientales y sociales en el territorio. Con tu donación hacemos posible el trabajo con las comunidades.",
   methods: [
     {
-      id: "wompi",
-      name: "Wompi",
-      subtitle: "Pasarela de pagos regional · Colombia",
-      kind: "link",
+      id: "daviplata",
+      name: "DaviPlata",
+      subtitle: "Transferencia directa · Colombia",
       description:
-        "Dona con los principales medios de pago de Colombia: PSE, Nequi, Bancolombia, DaviPlata, tarjetas de crédito y débito Visa y Mastercard, Sistecredito y pagos en efectivo. La transacción se realiza de forma segura sin salir de la pasarela.",
-      reference: "PENDIENTE: enlace de pago de Wompi",
-      placeholder: "Se agregará el link de cobro de tu cuenta Wompi.",
-      link: "https://wompi.com",
+        "Elige un monto y transfiérelo directamente a la cuenta DaviPlata de la Fundación. Después podrás reportar tu donación para que podamos verificarla.",
+      currency: "COP",
+      presets: [10000, 30000, 50000],
+      receiver: daviplataReceiver,
+      holder: daviplataHolder,
     },
     {
       id: "paypal",
       name: "PayPal",
-      subtitle: "Pasarela de pagos internacional",
-      kind: "link",
+      subtitle: "Transferencia directa · Internacional",
       description:
-        "Dona desde cualquier país del mundo con PayPal: saldo de PayPal, tarjetas de crédito o débito internacionales y pagos en distintas divisas. Ideal para donantes fuera de Colombia.",
-      reference: "PENDIENTE: correo de PayPal",
-      placeholder: "Ej: donaciones@fundacioncalidad.org2026",
-      link: "https://www.paypal.com/donate",
+        "Envía tu aporte directamente a la cuenta PayPal de la Fundación. PayPal puede aplicar comisiones según la cuenta y el tipo de operación.",
+      currency: "USD",
+      presets: [5, 15, 30],
+      link: paypalDonationUrl,
     },
-  ],
+  ] as const,
 };

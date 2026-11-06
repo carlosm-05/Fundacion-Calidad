@@ -10,9 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DonacionRouteImport } from './routes/donacion'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MetalmecanicosRouteImport } from './routes/metalmecanicos'
 import { Route as ProductosServiciosRouteImport } from './routes/productos-servicios'
+import { Route as ApiCatalogImagesRouteImport } from './routes/api/catalog-images'
+import { Route as ApiWompiEventRouteImport } from './routes/api/wompi-event'
+import { Route as CuentaComprasRouteImport } from './routes/cuenta/compras'
+import { Route as CuentaConfirmarRouteImport } from './routes/cuenta/confirmar'
+import { Route as CuentaLoginRouteImport } from './routes/cuenta/login'
+import { Route as CuentaRecuperarRouteImport } from './routes/cuenta/recuperar'
+import { Route as CuentaRegistroRouteImport } from './routes/cuenta/registro'
+import { Route as CuentaRestablecerRouteImport } from './routes/cuenta/restablecer'
+import { Route as PagoResultadoRouteImport } from './routes/pago/resultado'
 import { Route as ProyectosSlugRouteImport } from './routes/proyectos/$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -20,9 +31,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DonacionRoute = DonacionRouteImport.update({
   id: '/donacion',
   path: '/donacion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MetalmecanicosRoute = MetalmecanicosRouteImport.update({
@@ -35,6 +56,51 @@ const ProductosServiciosRoute = ProductosServiciosRouteImport.update({
   path: '/productos-servicios',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCatalogImagesRoute = ApiCatalogImagesRouteImport.update({
+  id: '/api/catalog-images',
+  path: '/api/catalog-images',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWompiEventRoute = ApiWompiEventRouteImport.update({
+  id: '/api/wompi-event',
+  path: '/api/wompi-event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaComprasRoute = CuentaComprasRouteImport.update({
+  id: '/cuenta/compras',
+  path: '/cuenta/compras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaConfirmarRoute = CuentaConfirmarRouteImport.update({
+  id: '/cuenta/confirmar',
+  path: '/cuenta/confirmar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaLoginRoute = CuentaLoginRouteImport.update({
+  id: '/cuenta/login',
+  path: '/cuenta/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaRecuperarRoute = CuentaRecuperarRouteImport.update({
+  id: '/cuenta/recuperar',
+  path: '/cuenta/recuperar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaRegistroRoute = CuentaRegistroRouteImport.update({
+  id: '/cuenta/registro',
+  path: '/cuenta/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CuentaRestablecerRoute = CuentaRestablecerRouteImport.update({
+  id: '/cuenta/restablecer',
+  path: '/cuenta/restablecer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagoResultadoRoute = PagoResultadoRouteImport.update({
+  id: '/pago/resultado',
+  path: '/pago/resultado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProyectosSlugRoute = ProyectosSlugRouteImport.update({
   id: '/proyectos/$slug',
   path: '/proyectos/$slug',
@@ -43,55 +109,132 @@ const ProyectosSlugRoute = ProyectosSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/donacion': typeof DonacionRoute
+  '/login': typeof LoginRoute
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
+  '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/wompi-event': typeof ApiWompiEventRoute
+  '/cuenta/compras': typeof CuentaComprasRoute
+  '/cuenta/confirmar': typeof CuentaConfirmarRoute
+  '/cuenta/login': typeof CuentaLoginRoute
+  '/cuenta/recuperar': typeof CuentaRecuperarRoute
+  '/cuenta/registro': typeof CuentaRegistroRoute
+  '/cuenta/restablecer': typeof CuentaRestablecerRoute
+  '/pago/resultado': typeof PagoResultadoRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/donacion': typeof DonacionRoute
+  '/login': typeof LoginRoute
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
+  '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/wompi-event': typeof ApiWompiEventRoute
+  '/cuenta/compras': typeof CuentaComprasRoute
+  '/cuenta/confirmar': typeof CuentaConfirmarRoute
+  '/cuenta/login': typeof CuentaLoginRoute
+  '/cuenta/recuperar': typeof CuentaRecuperarRoute
+  '/cuenta/registro': typeof CuentaRegistroRoute
+  '/cuenta/restablecer': typeof CuentaRestablecerRoute
+  '/pago/resultado': typeof PagoResultadoRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/donacion': typeof DonacionRoute
+  '/login': typeof LoginRoute
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
+  '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/wompi-event': typeof ApiWompiEventRoute
+  '/cuenta/compras': typeof CuentaComprasRoute
+  '/cuenta/confirmar': typeof CuentaConfirmarRoute
+  '/cuenta/login': typeof CuentaLoginRoute
+  '/cuenta/recuperar': typeof CuentaRecuperarRoute
+  '/cuenta/registro': typeof CuentaRegistroRoute
+  '/cuenta/restablecer': typeof CuentaRestablecerRoute
+  '/pago/resultado': typeof PagoResultadoRoute
   '/proyectos/$slug': typeof ProyectosSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/donacion'
+    | '/login'
     | '/metalmecanicos'
     | '/productos-servicios'
+    | '/api/catalog-images'
+    | '/api/wompi-event'
+    | '/cuenta/compras'
+    | '/cuenta/confirmar'
+    | '/cuenta/login'
+    | '/cuenta/recuperar'
+    | '/cuenta/registro'
+    | '/cuenta/restablecer'
+    | '/pago/resultado'
     | '/proyectos/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/donacion'
+    | '/login'
     | '/metalmecanicos'
     | '/productos-servicios'
+    | '/api/catalog-images'
+    | '/api/wompi-event'
+    | '/cuenta/compras'
+    | '/cuenta/confirmar'
+    | '/cuenta/login'
+    | '/cuenta/recuperar'
+    | '/cuenta/registro'
+    | '/cuenta/restablecer'
+    | '/pago/resultado'
     | '/proyectos/$slug'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/donacion'
+    | '/login'
     | '/metalmecanicos'
     | '/productos-servicios'
+    | '/api/catalog-images'
+    | '/api/wompi-event'
+    | '/cuenta/compras'
+    | '/cuenta/confirmar'
+    | '/cuenta/login'
+    | '/cuenta/recuperar'
+    | '/cuenta/registro'
+    | '/cuenta/restablecer'
+    | '/pago/resultado'
     | '/proyectos/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DonacionRoute: typeof DonacionRoute
+  LoginRoute: typeof LoginRoute
   MetalmecanicosRoute: typeof MetalmecanicosRoute
   ProductosServiciosRoute: typeof ProductosServiciosRoute
+  ApiCatalogImagesRoute: typeof ApiCatalogImagesRoute
+  ApiWompiEventRoute: typeof ApiWompiEventRoute
+  CuentaComprasRoute: typeof CuentaComprasRoute
+  CuentaConfirmarRoute: typeof CuentaConfirmarRoute
+  CuentaLoginRoute: typeof CuentaLoginRoute
+  CuentaRecuperarRoute: typeof CuentaRecuperarRoute
+  CuentaRegistroRoute: typeof CuentaRegistroRoute
+  CuentaRestablecerRoute: typeof CuentaRestablecerRoute
+  PagoResultadoRoute: typeof PagoResultadoRoute
   ProyectosSlugRoute: typeof ProyectosSlugRoute
 }
 
@@ -104,11 +247,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/donacion': {
       id: '/donacion'
       path: '/donacion'
       fullPath: '/donacion'
       preLoaderRoute: typeof DonacionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/metalmecanicos': {
@@ -125,6 +282,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductosServiciosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/catalog-images': {
+      id: '/api/catalog-images'
+      path: '/api/catalog-images'
+      fullPath: '/api/catalog-images'
+      preLoaderRoute: typeof ApiCatalogImagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/wompi-event': {
+      id: '/api/wompi-event'
+      path: '/api/wompi-event'
+      fullPath: '/api/wompi-event'
+      preLoaderRoute: typeof ApiWompiEventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/compras': {
+      id: '/cuenta/compras'
+      path: '/cuenta/compras'
+      fullPath: '/cuenta/compras'
+      preLoaderRoute: typeof CuentaComprasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/confirmar': {
+      id: '/cuenta/confirmar'
+      path: '/cuenta/confirmar'
+      fullPath: '/cuenta/confirmar'
+      preLoaderRoute: typeof CuentaConfirmarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/login': {
+      id: '/cuenta/login'
+      path: '/cuenta/login'
+      fullPath: '/cuenta/login'
+      preLoaderRoute: typeof CuentaLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/recuperar': {
+      id: '/cuenta/recuperar'
+      path: '/cuenta/recuperar'
+      fullPath: '/cuenta/recuperar'
+      preLoaderRoute: typeof CuentaRecuperarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/registro': {
+      id: '/cuenta/registro'
+      path: '/cuenta/registro'
+      fullPath: '/cuenta/registro'
+      preLoaderRoute: typeof CuentaRegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cuenta/restablecer': {
+      id: '/cuenta/restablecer'
+      path: '/cuenta/restablecer'
+      fullPath: '/cuenta/restablecer'
+      preLoaderRoute: typeof CuentaRestablecerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pago/resultado': {
+      id: '/pago/resultado'
+      path: '/pago/resultado'
+      fullPath: '/pago/resultado'
+      preLoaderRoute: typeof PagoResultadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/proyectos/$slug': {
       id: '/proyectos/$slug'
       path: '/proyectos/$slug'
@@ -137,9 +357,20 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DonacionRoute: DonacionRoute,
+  LoginRoute: LoginRoute,
   MetalmecanicosRoute: MetalmecanicosRoute,
   ProductosServiciosRoute: ProductosServiciosRoute,
+  ApiCatalogImagesRoute: ApiCatalogImagesRoute,
+  ApiWompiEventRoute: ApiWompiEventRoute,
+  CuentaComprasRoute: CuentaComprasRoute,
+  CuentaConfirmarRoute: CuentaConfirmarRoute,
+  CuentaLoginRoute: CuentaLoginRoute,
+  CuentaRecuperarRoute: CuentaRecuperarRoute,
+  CuentaRegistroRoute: CuentaRegistroRoute,
+  CuentaRestablecerRoute: CuentaRestablecerRoute,
+  PagoResultadoRoute: PagoResultadoRoute,
   ProyectosSlugRoute: ProyectosSlugRoute,
 }
 export const routeTree = rootRouteImport

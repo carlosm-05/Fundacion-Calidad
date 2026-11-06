@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ExternalLink, HandHeart, ShieldCheck } from "lucide-react";
+import { ArrowLeft, HandHeart, ShieldCheck } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { DonationOptions } from "@/components/DonationOptions";
 import { Reveal } from "@/components/ui/reveal";
 import { contact, donation } from "@/content/site";
 
@@ -58,50 +59,14 @@ function DonationPage() {
                 Elige cómo quieres donar
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                Selecciona la pasarela de pago de tu preferencia. Wompi para donaciones regionales
-                en Colombia y PayPal para donaciones internacionales.
+                Puedes transferir directamente a DaviPlata en Colombia o enviar tu aporte a la
+                cuenta PayPal de la Fundación desde otro país.
               </p>
             </Reveal>
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2">
-              {donation.methods.map((method, i) => (
-                <Reveal
-                  key={method.id}
-                  delay={i * 80}
-                  className="flex flex-col rounded-3xl border border-border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-secondary/45 hover:shadow-lift"
-                >
-                  <div className="flex items-center justify-between">
-                    <MethodBadge name={method.name} />
-                    <span className="rounded-full bg-secondary/10 px-2.5 py-1 text-xs font-medium text-secondary">
-                      {method.name === "Wompi" ? "Regional" : "Internacional"}
-                    </span>
-                  </div>
-
-                  <p className="mt-4 text-sm font-medium text-muted-foreground">
-                    {method.subtitle}
-                  </p>
-
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-                    {method.description}
-                  </p>
-
-                  <div className="mt-6 border-t border-border pt-4">
-                    <p className="text-xs text-muted-foreground/80">
-                      Haz clic para abrir la pasarela de pago.
-                    </p>
-                    <a
-                      href={method.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
-                    >
-                      Donar con {method.name}
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+            <Reveal>
+              <DonationOptions />
+            </Reveal>
 
             {/* Confianza */}
             <Reveal className="mt-14">
@@ -126,19 +91,5 @@ function DonationPage() {
       </main>
       <Footer />
     </div>
-  );
-}
-
-function MethodBadge({ name }: { name: string }) {
-  const styles: Record<string, string> = {
-    Wompi: "bg-[#00b3e3] text-white",
-    PayPal: "bg-[#003087] text-white",
-  };
-  return (
-    <span
-      className={`rounded-full px-3 py-1.5 text-sm font-bold ${styles[name] ?? "bg-muted text-foreground"}`}
-    >
-      {name}
-    </span>
   );
 }
