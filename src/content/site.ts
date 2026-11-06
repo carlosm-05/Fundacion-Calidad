@@ -47,8 +47,8 @@ export const navLinks = [
   { label: "Inicio", href: "/#inicio" },
   { label: "Nosotros", href: "/#nosotros" },
   { label: "Proyectos", href: "/#proyectos" },
-  { label: "Productos y servicios", href: "/productos-servicios" },
   { label: "Contacto", href: "/#contacto" },
+  { label: "Productos y servicios", href: "/productos-servicios" },
 ];
 
 export interface Project {
