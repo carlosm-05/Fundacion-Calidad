@@ -152,6 +152,66 @@ export const startServicePurchaseFn = createServerFn({ method: "POST" })
     return { ok: true, checkoutUrl: checkout.toString() };
   });
 
+const startDonationSchema = z.object({
+  nombre: z.string().trim().min(1).max(200),
+  correo: z.string().trim().email().max(320),
+  telefono: z
+    .string()
+    .trim()
+    .min(7)
+    .max(50)
+    .refine((value) => (value.match(/\d/g)?.length ?? 0) >= 7),
+  monto: z.number().int().min(1000).max(100_000_000),
+  website: z.string().max(0).optional(),
+});
+
+export type StartDonationResult =
+  { ok: true; checkoutUrl: string } | { ok: false; error: "config" | "database" };
+
+export const startDonationCheckoutFn = createServerFn({ method: "POST" })
+  .validator((input: z.infer<typeof startDonationSchema>) => startDonationSchema.parse(input))
+  .handler(async ({ data }): Promise<StartDonationResult> => {
+    if (data.website) return { ok: false, error: "database" };
+
+    const supabase = getSupabaseAdminClient();
+    const wompi = getWompiConfig();
+    if (!supabase || !wompi) return { ok: false, error: "config" };
+
+    const amountCents = data.monto * 100;
+    const paymentReference = `don_${crypto.randomUUID().replaceAll("-", "")}`;
+    const { data: donation, error } = await supabase
+      .from("donations")
+      .insert({
+        donor_name: data.nombre,
+        donor_email: data.correo,
+        donor_phone: data.telefono,
+        amount_cents: amountCents,
+        currency: "COP",
+        payment_reference: paymentReference,
+      })
+      .select("id")
+      .single();
+
+    if (error || !donation) {
+      console.error("[donaciones] No se pudo registrar la donación:", error);
+      return { ok: false, error: "database" };
+    }
+
+    const signature = await sha256(`${paymentReference}${amountCents}COP${wompi.integritySecret}`);
+    const appUrl = (env("APP_URL") ?? "http://localhost:8080").replace(/\/+$/, "");
+    const checkout = new URL("https://checkout.wompi.co/p/");
+    checkout.searchParams.set("public-key", wompi.publicKey);
+    checkout.searchParams.set("currency", "COP");
+    checkout.searchParams.set("amount-in-cents", String(amountCents));
+    checkout.searchParams.set("reference", paymentReference);
+    checkout.searchParams.set("signature:integrity", signature);
+    checkout.searchParams.set("redirect-url", `${appUrl}/pago/resultado?donation=${donation.id}`);
+    checkout.searchParams.set("customer-data:email", data.correo);
+    checkout.searchParams.set("customer-data:full-name", data.nombre);
+
+    return { ok: true, checkoutUrl: checkout.toString() };
+  });
+
 export type CustomerPurchase = Purchase;
 
 export const getCustomerPurchasesFn = createServerFn({ method: "GET" }).handler(
@@ -200,6 +260,37 @@ export const getCustomerPurchaseFn = createServerFn({ method: "GET" })
     }
     if (!purchase) return { ok: false as const, error: "not_found" as const };
     return { ok: true as const, purchase: purchase as CustomerPurchase };
+  });
+
+export type DonationPaymentStatus = {
+  id: string;
+  amount_cents: number;
+  currency: string;
+  status: string;
+  payment_status: string;
+  payment_reference: string;
+  created_at: string;
+};
+
+const donationPaymentSchema = z.object({ donationId: z.string().uuid() });
+
+export const getDonationPaymentStatusFn = createServerFn({ method: "GET" })
+  .validator((input: z.infer<typeof donationPaymentSchema>) => donationPaymentSchema.parse(input))
+  .handler(async ({ data }) => {
+    const supabase = getSupabaseAdminClient();
+    if (!supabase) return { ok: false as const, error: "config" as const };
+
+    const { data: donation, error } = await supabase
+      .from("donations")
+      .select("id,amount_cents,currency,status,payment_status,payment_reference,created_at")
+      .eq("id", data.donationId)
+      .maybeSingle();
+    if (error) {
+      console.error("[donaciones] No se pudo consultar el estado del pago:", error);
+      return { ok: false as const, error: "database" as const };
+    }
+    if (!donation) return { ok: false as const, error: "not_found" as const };
+    return { ok: true as const, donation: donation as DonationPaymentStatus };
   });
 
 export type AdminPurchase = Purchase & {
@@ -251,6 +342,38 @@ export const getAdminPurchasesFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
+export type AdminDonation = DonationPaymentStatus & {
+  donor_name: string;
+  donor_email: string;
+  donor_phone: string;
+  payment_transaction_id: string | null;
+};
+
+export const getAdminDonationsFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<
+    | { ok: true; donations: AdminDonation[] }
+    | { ok: false; error: "unauthorized" | "config" | "database" }
+  > => {
+    const session = await getAdminSessionForServer();
+    if (!session.user) return { ok: false, error: "unauthorized" };
+    const supabase = getSupabaseAdminClient();
+    if (!supabase) return { ok: false, error: "config" };
+
+    const { data, error } = await supabase
+      .from("donations")
+      .select(
+        "id,donor_name,donor_email,donor_phone,amount_cents,currency,status,payment_status,payment_reference,payment_transaction_id,created_at",
+      )
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) {
+      console.error("[donaciones] No se pudieron cargar las donaciones:", error);
+      return { ok: false, error: "database" };
+    }
+    return { ok: true, donations: data };
+  },
+);
+
 const wompiEventSchema = z.object({
   event: z.string(),
   environment: z.enum(["test", "prod"]),
@@ -273,6 +396,63 @@ function getEventProperty(eventData: Record<string, unknown>, property: string) 
     value = (value as Record<string, unknown>)[part];
   }
   return value;
+}
+
+async function processWompiDonationEvent(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  reference: string,
+  transactionId: string,
+  amount: number,
+  status: string,
+) {
+  const { data: donation, error } = await supabase
+    .from("donations")
+    .select("id,amount_cents,currency,status,payment_transaction_id")
+    .eq("payment_reference", reference)
+    .maybeSingle();
+  if (error) {
+    console.error("[donaciones] No se pudo verificar la referencia de Wompi:", error);
+    return { ok: false as const, status: 500 };
+  }
+  if (!donation) {
+    console.warn("[donaciones] Evento Wompi recibido para una referencia no registrada.");
+    return { ok: true as const };
+  }
+  if (Number(donation.amount_cents) !== amount || donation.currency !== "COP") {
+    console.error("[donaciones] El monto o la moneda del evento no coincide con la donación.");
+    return { ok: false as const, status: 400 };
+  }
+  if (donation.payment_transaction_id === transactionId || donation.status === "paid") {
+    return { ok: true as const };
+  }
+  if (donation.payment_transaction_id) {
+    console.error("[donaciones] La donación ya está asociada a otra transacción de Wompi.");
+    return { ok: false as const, status: 409 };
+  }
+
+  const statusMap: Record<string, { donation: string; payment: string }> = {
+    APPROVED: { donation: "paid", payment: "approved" },
+    DECLINED: { donation: "failed", payment: "declined" },
+    ERROR: { donation: "failed", payment: "error" },
+    VOIDED: { donation: "cancelled", payment: "voided" },
+  };
+  const mappedStatus = statusMap[status];
+  if (!mappedStatus || donation.status !== "pending") return { ok: true as const };
+
+  const { error: updateError } = await supabase
+    .from("donations")
+    .update({
+      status: mappedStatus.donation,
+      payment_status: mappedStatus.payment,
+      payment_transaction_id: transactionId,
+    })
+    .eq("id", donation.id)
+    .eq("status", "pending");
+  if (updateError) {
+    console.error("[donaciones] No se pudo actualizar el estado del pago:", updateError);
+    return { ok: false as const, status: 500 };
+  }
+  return { ok: true as const };
 }
 
 export async function processWompiEvent(input: unknown) {
@@ -316,6 +496,10 @@ export async function processWompiEvent(input: unknown) {
 
   const supabase = getSupabaseAdminClient();
   if (!supabase) return { ok: false as const, status: 503 };
+  if (reference.startsWith("don_")) {
+    return processWompiDonationEvent(supabase, reference, transactionId, amount, status);
+  }
+
   const { data: purchase, error: lookupError } = await supabase
     .from("purchases")
     .select("id,amount_cents,currency,status,payment_transaction_id")

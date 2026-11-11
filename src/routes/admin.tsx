@@ -40,7 +40,12 @@ import {
   type ProductRecord,
   type ServiceRecord,
 } from "@/lib/catalog-server";
-import { getAdminPurchasesFn, type AdminPurchase } from "@/lib/purchase-server";
+import {
+  getAdminDonationsFn,
+  getAdminPurchasesFn,
+  type AdminDonation,
+  type AdminPurchase,
+} from "@/lib/purchase-server";
 import { logoutFn, sessionFn } from "@/lib/auth-server";
 
 const title = "Panel de administración | Fundación Calidad";
@@ -132,6 +137,8 @@ function AdminPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [purchases, setPurchases] = useState<AdminPurchase[]>([]);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [donations, setDonations] = useState<AdminDonation[]>([]);
+  const [donationError, setDonationError] = useState<string | null>(null);
 
   const refreshCatalog = useCallback(async () => {
     setLoading(true);
@@ -149,16 +156,16 @@ function AdminPage() {
 
   useEffect(() => {
     void refreshCatalog();
-    void getAdminPurchasesFn()
-      .then((result) => {
-        if (!result.ok) {
-          setPurchaseError("No se pudieron cargar las compras.");
-          return;
-        }
-        setPurchases(result.purchases);
+    void Promise.all([getAdminPurchasesFn(), getAdminDonationsFn()])
+      .then(([purchaseResult, donationResult]) => {
+        if (purchaseResult.ok) setPurchases(purchaseResult.purchases);
+        else setPurchaseError("No se pudieron cargar las compras.");
+        if (donationResult.ok) setDonations(donationResult.donations);
+        else setDonationError("No se pudieron cargar las donaciones.");
       })
       .catch(() => {
         setPurchaseError("No se pudieron cargar las compras.");
+        setDonationError("No se pudieron cargar las donaciones.");
       });
   }, [refreshCatalog]);
 
@@ -183,7 +190,7 @@ function AdminPage() {
             </p>
             <h1 className="mt-2 font-display text-3xl font-semibold text-primary">Hola de nuevo</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Gestiona por separado los productos y servicios publicados en el sitio.
+              Gestiona los catálogos y consulta el estado de compras y donaciones.
             </p>
           </div>
           <Button variant="outline" onClick={handleLogout} disabled={logoutPending}>
@@ -258,6 +265,7 @@ function AdminPage() {
                 <TabsTrigger value="products">Productos ({catalog.products.length})</TabsTrigger>
                 <TabsTrigger value="services">Servicios ({catalog.services.length})</TabsTrigger>
                 <TabsTrigger value="purchases">Compras ({purchases.length})</TabsTrigger>
+                <TabsTrigger value="donations">Donaciones ({donations.length})</TabsTrigger>
               </TabsList>
               <TabsContent value="products">
                 <CatalogPanel
@@ -288,6 +296,24 @@ function AdminPage() {
                         setPurchases(result.purchases);
                       })
                       .catch(() => setPurchaseError("No se pudieron cargar las compras."));
+                  }}
+                />
+              </TabsContent>
+              <TabsContent value="donations">
+                <DonationList
+                  donations={donations}
+                  error={donationError}
+                  onRetry={() => {
+                    setDonationError(null);
+                    void getAdminDonationsFn()
+                      .then((result) => {
+                        if (!result.ok) {
+                          setDonationError("No se pudieron cargar las donaciones.");
+                          return;
+                        }
+                        setDonations(result.donations);
+                      })
+                      .catch(() => setDonationError("No se pudieron cargar las donaciones."));
                   }}
                 />
               </TabsContent>
@@ -366,6 +392,72 @@ function PurchaseList({
               </p>
               <p className="mt-1 capitalize text-muted-foreground">
                 {purchase.status} · pago {purchase.payment_status}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function DonationList({
+  donations,
+  error,
+  onRetry,
+}: {
+  donations: AdminDonation[];
+  error: string | null;
+  onRetry: () => void;
+}) {
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>No se pudieron cargar las donaciones</AlertTitle>
+        <AlertDescription className="flex items-center gap-3">
+          {error}
+          <button type="button" className="font-semibold underline" onClick={onRetry}>
+            Reintentar
+          </button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+  if (!donations.length) {
+    return (
+      <Card>
+        <CardContent className="py-8 text-sm text-muted-foreground">
+          Todavía no hay donaciones registradas.
+        </CardContent>
+      </Card>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {donations.map((donation) => (
+        <Card key={donation.id} className="border-border/70">
+          <CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h3 className="font-semibold text-foreground">{donation.donor_name}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {donation.donor_email} · {donation.donor_phone}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {new Date(donation.created_at).toLocaleString("es-CO")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Referencia: {donation.payment_reference}
+                {donation.payment_transaction_id
+                  ? ` · Transacción: ${donation.payment_transaction_id}`
+                  : ""}
+              </p>
+            </div>
+            <div className="text-sm sm:text-right">
+              <p className="font-semibold text-foreground">
+                {formatPurchasePrice(donation.amount_cents, donation.currency)}
+              </p>
+              <p className="mt-1 capitalize text-muted-foreground">
+                {donation.status} · pago {donation.payment_status}
               </p>
             </div>
           </CardContent>

@@ -4,8 +4,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { donation } from "@/content/site";
 import { sendDonationReportFn } from "@/lib/contact-server";
+import { startDonationCheckoutFn } from "@/lib/purchase-server";
 
-type DonationMethodId = "daviplata" | "paypal";
+type DonationMethodId = "wompi" | "daviplata" | "paypal";
 type ReportStatus = "idle" | "sending" | "success" | "error" | "config";
 
 const fieldClass =
@@ -20,19 +21,22 @@ function formatAmount(amount: number, currency: string) {
 }
 
 export function DonationOptions() {
-  const [methodId, setMethodId] = useState<DonationMethodId>("daviplata");
+  const [methodId, setMethodId] = useState<DonationMethodId>("wompi");
   const [amount, setAmount] = useState("10000");
   const [status, setStatus] = useState<ReportStatus>("idle");
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const [hasReportedIntent, setHasReportedIntent] = useState(false);
 
-  const selectedMethod = methodId === "daviplata" ? donation.methods[0] : donation.methods[1];
+  const selectedMethod =
+    donation.methods.find((method) => method.id === methodId) ?? donation.methods[0];
 
   const isReady =
-    selectedMethod.id === "daviplata"
-      ? Boolean(selectedMethod.receiver)
-      : Boolean(selectedMethod.link);
+    selectedMethod.id === "wompi"
+      ? true
+      : selectedMethod.id === "daviplata"
+        ? Boolean(selectedMethod.receiver)
+        : Boolean(selectedMethod.link);
   const numericAmount = Number(amount);
   const minimumAmount = selectedMethod.currency === "COP" ? 1000 : 1;
   const maximumAmount = selectedMethod.currency === "COP" ? 100_000_000 : 100_000;
@@ -73,6 +77,24 @@ export function DonationOptions() {
     const formData = new FormData(form);
     setStatus("sending");
     try {
+      if (selectedMethod.id === "wompi") {
+        const result = await startDonationCheckoutFn({
+          data: {
+            nombre: String(formData.get("nombre") ?? ""),
+            correo: String(formData.get("correo") ?? ""),
+            telefono: String(formData.get("telefono") ?? ""),
+            monto: numericAmount,
+            website: String(formData.get("website") ?? ""),
+          },
+        });
+        if (result.ok) {
+          window.location.assign(result.checkoutUrl);
+          return;
+        }
+        setStatus(result.error === "config" ? "config" : "error");
+        return;
+      }
+
       const result = await sendDonationReportFn({
         data: {
           nombre: String(formData.get("nombre") ?? ""),
@@ -117,9 +139,11 @@ export function DonationOptions() {
                 />
                 <span
                   className={`rounded-full px-3 py-1.5 text-sm font-bold ${
-                    method.id === "daviplata"
-                      ? "bg-[#e6007e] text-white"
-                      : "bg-[#003087] text-white"
+                    method.id === "wompi"
+                      ? "bg-[#27346a] text-white"
+                      : method.id === "daviplata"
+                        ? "bg-[#e6007e] text-white"
+                        : "bg-[#003087] text-white"
                   }`}
                 >
                   {method.name}
@@ -166,13 +190,15 @@ export function DonationOptions() {
                   />
                 </label>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  {method.id === "daviplata"
-                    ? method.receiver
-                      ? "La cuenta receptora se mostrará después de avisar a la Fundación."
-                      : "El número de DaviPlata se habilitará cuando el propietario lo confirme."
-                    : method.link
-                      ? "El enlace para continuar a PayPal se mostrará después de avisar a la Fundación. Si el monto no aparece precargado, ingrésalo en PayPal. Pueden aplicarse comisiones."
-                      : "El enlace oficial de PayPal se habilitará cuando el propietario lo comparta."}
+                  {method.id === "wompi"
+                    ? "Continuarás al checkout de Wompi. El estado se confirmará mediante una notificación segura de la pasarela."
+                    : method.id === "daviplata"
+                      ? method.receiver
+                        ? "La cuenta receptora se mostrará después de avisar a la Fundación."
+                        : "El número de DaviPlata se habilitará cuando el propietario lo confirme."
+                      : method.link
+                        ? "El enlace para continuar a PayPal se mostrará después de avisar a la Fundación. Si el monto no aparece precargado, ingrésalo en PayPal. Pueden aplicarse comisiones."
+                        : "El enlace oficial de PayPal se habilitará cuando el propietario lo comparta."}
                 </p>
               </div>
             ) : null}
@@ -185,9 +211,9 @@ export function DonationOptions() {
           Datos para continuar con tu donación
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Al pulsar “Dirigirse a donar”, enviaremos a la Fundación un aviso con tus datos, el monto
-          elegido y el método. Es un aviso de intención, no una confirmación de pago; la recepción
-          se verifica manualmente.
+          {selectedMethod.id === "wompi"
+            ? "Ingresa tus datos y el monto para continuar al checkout seguro de Wompi. La confirmación del pago se recibirá desde la pasarela."
+            : "Al pulsar “Dirigirse a donar”, enviaremos a la Fundación un aviso con tus datos, el monto elegido y el método. Es un aviso de intención, no una confirmación de pago; la recepción se verifica manualmente."}
         </p>
 
         {status === "success" ? (
@@ -203,11 +229,19 @@ export function DonationOptions() {
         ) : null}
         {status === "config" || status === "error" ? (
           <Alert variant="destructive" className="mt-5">
-            <AlertTitle>No se pudo enviar el reporte</AlertTitle>
+            <AlertTitle>
+              {selectedMethod.id === "wompi"
+                ? "No se pudo iniciar el pago"
+                : "No se pudo enviar el reporte"}
+            </AlertTitle>
             <AlertDescription>
-              {status === "config"
-                ? "El correo de notificación aún no está configurado."
-                : "Inténtalo de nuevo más tarde o contáctanos directamente."}
+              {selectedMethod.id === "wompi"
+                ? status === "config"
+                  ? "El checkout de Wompi aún no está configurado. Inténtalo más tarde o usa una transferencia manual."
+                  : "No se pudo iniciar el checkout. Inténtalo de nuevo más tarde."
+                : status === "config"
+                  ? "El correo de notificación aún no está configurado."
+                  : "Inténtalo de nuevo más tarde o contáctanos directamente."}
             </AlertDescription>
           </Alert>
         ) : null}
@@ -274,11 +308,19 @@ export function DonationOptions() {
               }
             >
               {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {status === "sending" ? "Avisando a la Fundación…" : "Dirigirse a donar"}
+              {status === "sending"
+                ? selectedMethod.id === "wompi"
+                  ? "Preparando pago…"
+                  : "Avisando a la Fundación…"
+                : selectedMethod.id === "wompi"
+                  ? "Pagar con Wompi"
+                  : "Dirigirse a donar"}
             </Button>
             {!isReady ? (
               <p className="mt-2 text-center text-xs text-muted-foreground">
-                Esta opción estará disponible cuando la Fundación configure los datos de recepción.
+                {selectedMethod.id === "daviplata"
+                  ? "Esta opción estará disponible cuando la Fundación configure los datos de recepción."
+                  : "Esta opción estará disponible cuando la Fundación configure el enlace oficial de PayPal."}
               </p>
             ) : null}
           </div>

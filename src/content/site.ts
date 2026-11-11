@@ -568,6 +568,15 @@ export const donation = {
     "Tu apoyo es fundamental para seguir impulsando proyectos ambientales y sociales en el territorio. Con tu donación hacemos posible el trabajo con las comunidades.",
   methods: [
     {
+      id: "wompi",
+      name: "Pago en línea",
+      subtitle: "Checkout seguro · Colombia",
+      description:
+        "Paga en línea mediante el checkout seguro de Wompi. La Fundación confirmará la recepción cuando Wompi notifique el resultado.",
+      currency: "COP",
+      presets: [10000, 30000, 50000],
+    },
+    {
       id: "daviplata",
       name: "DaviPlata",
       subtitle: "Transferencia directa · Colombia",

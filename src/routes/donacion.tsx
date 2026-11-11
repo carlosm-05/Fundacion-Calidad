@@ -59,8 +59,8 @@ function DonationPage() {
                 Elige cómo quieres donar
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                Puedes transferir directamente a DaviPlata en Colombia o enviar tu aporte a la
-                cuenta PayPal de la Fundación desde otro país.
+                Puedes pagar en línea con Wompi, transferir manualmente a DaviPlata o enviar tu
+                aporte a PayPal desde otro país.
               </p>
             </Reveal>
 
