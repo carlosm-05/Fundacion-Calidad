@@ -12,6 +12,7 @@ export type ProductRecord = {
   description: string;
   price: string | null;
   gallery: string[];
+  technical_sheet_url: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -106,6 +107,24 @@ function getManagedImagePaths(imageUrls: string[]) {
   });
 }
 
+function getManagedTechnicalSheetPaths(fileUrls: string[]) {
+  const baseUrl = env("SUPABASE_URL");
+  if (!baseUrl) return [];
+  const baseOrigin = new URL(baseUrl).origin;
+  const prefix = "/storage/v1/object/public/catalog-technical-sheets/";
+
+  return fileUrls.flatMap((fileUrl) => {
+    try {
+      const parsed = new URL(fileUrl);
+      if (parsed.origin !== baseOrigin || !parsed.pathname.startsWith(prefix)) return [];
+      const path = decodeURIComponent(parsed.pathname.slice(prefix.length));
+      return /^products\/[0-9a-f-]{36}\.pdf$/i.test(path) ? [path] : [];
+    } catch {
+      return [];
+    }
+  });
+}
+
 async function removeCatalogImages(
   client: {
     storage: {
@@ -123,6 +142,23 @@ async function removeCatalogImages(
   if (error) console.error("[catalogo] No se pudieron eliminar algunas imágenes:", error);
 }
 
+async function removeCatalogTechnicalSheets(
+  client: {
+    storage: {
+      from: (bucket: string) => {
+        remove: (paths: string[]) => Promise<{ error: unknown }>;
+      };
+    };
+  },
+  fileUrls: string[],
+) {
+  const paths = getManagedTechnicalSheetPaths(fileUrls);
+  if (!paths.length) return;
+
+  const { error } = await client.storage.from("catalog-technical-sheets").remove(paths);
+  if (error) console.error("[catalogo] No se pudieron eliminar algunas fichas técnicas:", error);
+}
+
 export const getPublishedCatalogFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicCatalogResult> => {
     const client = createPublicClient();
@@ -131,7 +167,9 @@ export const getPublishedCatalogFn = createServerFn({ method: "GET" }).handler(
     const [productsResult, servicesResult] = await Promise.all([
       client
         .from("products")
-        .select("id,name,model,description,price,gallery,is_active,created_at,updated_at")
+        .select(
+          "id,name,model,description,price,gallery,technical_sheet_url,is_active,created_at,updated_at",
+        )
         .eq("is_active", true)
         .order("created_at", { ascending: true }),
       client
@@ -167,7 +205,9 @@ export const getAdminCatalogFn = createServerFn({ method: "GET" }).handler(
     const [productsResult, servicesResult] = await Promise.all([
       admin.client
         .from("products")
-        .select("id,name,model,description,price,gallery,is_active,created_at,updated_at")
+        .select(
+          "id,name,model,description,price,gallery,technical_sheet_url,is_active,created_at,updated_at",
+        )
         .order("created_at", { ascending: true }),
       admin.client
         .from("services")
@@ -203,17 +243,52 @@ const imagePathSchema = z
     "Use una URL http(s) o una ruta local del sitio.",
   );
 
-const saveCatalogItemSchema = z.object({
-  kind: z.enum(["product", "service"]),
-  id: z.string().uuid().optional(),
-  name: z.string().trim().min(1).max(160),
-  model: z.string().trim().max(160).optional().default(""),
-  description: z.string().trim().min(1).max(4000),
-  price: z.string().trim().max(120).optional().default(""),
-  priceAmountCop: z.number().int().positive().max(999999999).nullable().optional(),
-  gallery: z.array(imagePathSchema).max(8).optional().default([]),
-  isActive: z.boolean().default(true),
-});
+const technicalSheetUrlSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2048)
+  .nullable()
+  .optional()
+  .refine((value) => {
+    if (!value) return true;
+    const baseUrl = env("SUPABASE_URL");
+    if (!baseUrl) return false;
+    try {
+      const parsed = new URL(value);
+      return (
+        parsed.origin === new URL(baseUrl).origin &&
+        /^\/storage\/v1\/object\/public\/catalog-technical-sheets\/products\/[0-9a-f-]{36}\.pdf$/i.test(
+          parsed.pathname,
+        )
+      );
+    } catch {
+      return false;
+    }
+  }, "La ficha técnica debe ser un PDF almacenado en el catálogo.");
+
+const saveCatalogItemSchema = z
+  .object({
+    kind: z.enum(["product", "service"]),
+    id: z.string().uuid().optional(),
+    name: z.string().trim().min(1).max(160),
+    model: z.string().trim().max(160).optional().default(""),
+    description: z.string().trim().min(1).max(4000),
+    price: z.string().trim().max(120).optional().default(""),
+    priceAmountCop: z.number().int().positive().max(999999999).nullable().optional(),
+    gallery: z.array(imagePathSchema).max(8).optional().default([]),
+    technicalSheetUrl: technicalSheetUrlSchema,
+    isActive: z.boolean().default(true),
+  })
+  .superRefine((data, context) => {
+    if (data.kind === "service" && data.technicalSheetUrl) {
+      context.addIssue({
+        code: "custom",
+        path: ["technicalSheetUrl"],
+        message: "Los servicios no pueden tener ficha técnica.",
+      });
+    }
+  });
 
 export const saveCatalogItemFn = createServerFn({ method: "POST" })
   .validator((input: z.infer<typeof saveCatalogItemSchema>) => saveCatalogItemSchema.parse(input))
@@ -227,25 +302,44 @@ export const saveCatalogItemFn = createServerFn({ method: "POST" })
       price: data.price || null,
       is_active: data.isActive,
     };
-    const table = data.kind === "product" ? "products" : "services";
     let previousGallery: string[] = [];
+    let previousTechnicalSheetUrl: string | null = null;
     if (data.id) {
-      const { data: existing, error: existingError } = await admin.client
-        .from(table)
-        .select("gallery")
-        .eq("id", data.id)
-        .maybeSingle();
-      if (existingError || !existing) {
-        console.error("[catalogo] No se pudo cargar el elemento para editar:", existingError);
-        return { ok: false, error: "database" };
+      if (data.kind === "product") {
+        const { data: existing, error: existingError } = await admin.client
+          .from("products")
+          .select("gallery,technical_sheet_url")
+          .eq("id", data.id)
+          .maybeSingle();
+        if (existingError || !existing) {
+          console.error("[catalogo] No se pudo cargar el producto para editar:", existingError);
+          return { ok: false, error: "database" };
+        }
+        previousGallery = existing.gallery;
+        previousTechnicalSheetUrl = existing.technical_sheet_url;
+      } else {
+        const { data: existing, error: existingError } = await admin.client
+          .from("services")
+          .select("gallery")
+          .eq("id", data.id)
+          .maybeSingle();
+        if (existingError || !existing) {
+          console.error("[catalogo] No se pudo cargar el servicio para editar:", existingError);
+          return { ok: false, error: "database" };
+        }
+        previousGallery = existing.gallery;
       }
-      previousGallery = existing.gallery;
     }
 
     let saveError: unknown = null;
     let saved = false;
     if (data.kind === "product") {
-      const values = { ...commonValues, model: data.model || null, gallery: data.gallery };
+      const values = {
+        ...commonValues,
+        model: data.model || null,
+        gallery: data.gallery,
+        technical_sheet_url: data.technicalSheetUrl ?? null,
+      };
       const result = data.id
         ? await admin.client
             .from("products")
@@ -286,6 +380,12 @@ export const saveCatalogItemFn = createServerFn({ method: "POST" })
       admin.client,
       previousGallery.filter((imageUrl) => !data.gallery.includes(imageUrl)),
     );
+    if (
+      previousTechnicalSheetUrl &&
+      previousTechnicalSheetUrl !== (data.technicalSheetUrl ?? null)
+    ) {
+      await removeCatalogTechnicalSheets(admin.client, [previousTechnicalSheetUrl]);
+    }
     return { ok: true };
   });
 
@@ -326,20 +426,35 @@ export const deleteCatalogItemFn = createServerFn({ method: "POST" })
     const admin = await createAdminClient();
     if ("error" in admin) return { ok: false, error: admin.error };
 
-    const table = data.kind === "product" ? "products" : "services";
-    const { data: item, error: readError } = await admin.client
-      .from(table)
-      .select("gallery")
-      .eq("id", data.id)
-      .maybeSingle();
-
-    if (readError) {
-      console.error("[catalogo] No se pudieron leer las imágenes del elemento:", readError);
-      return { ok: false, error: "database" };
+    let gallery: string[] = [];
+    let technicalSheetUrl: string | null = null;
+    if (data.kind === "product") {
+      const { data: item, error: readError } = await admin.client
+        .from("products")
+        .select("gallery,technical_sheet_url")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (readError) {
+        console.error("[catalogo] No se pudieron leer las imágenes del producto:", readError);
+        return { ok: false, error: "database" };
+      }
+      gallery = item?.gallery ?? [];
+      technicalSheetUrl = item?.technical_sheet_url ?? null;
+    } else {
+      const { data: item, error: readError } = await admin.client
+        .from("services")
+        .select("gallery")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (readError) {
+        console.error("[catalogo] No se pudieron leer las imágenes del servicio:", readError);
+        return { ok: false, error: "database" };
+      }
+      gallery = item?.gallery ?? [];
     }
 
     const { data: deleted, error } = await admin.client
-      .from(table)
+      .from(data.kind === "product" ? "products" : "services")
       .delete()
       .eq("id", data.id)
       .select("id")
@@ -350,6 +465,7 @@ export const deleteCatalogItemFn = createServerFn({ method: "POST" })
       return { ok: false, error: "database" };
     }
 
-    if (item?.gallery.length) await removeCatalogImages(admin.client, item.gallery);
+    if (gallery.length) await removeCatalogImages(admin.client, gallery);
+    if (technicalSheetUrl) await removeCatalogTechnicalSheets(admin.client, [technicalSheetUrl]);
     return { ok: true };
   });

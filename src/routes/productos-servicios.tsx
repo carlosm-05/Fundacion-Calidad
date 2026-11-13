@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Cog, Handshake } from "lucide-react";
+import { ArrowLeft, Cog, FileDown, Handshake } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ProductGallery } from "@/components/ProductGallery";
@@ -214,6 +214,16 @@ function ProductosServiciosPage() {
 
                       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border p-6 sm:p-7">
                         <PriceTag price={product.price} />
+                        {product.technical_sheet_url ? (
+                          <a
+                            href={`${product.technical_sheet_url}?download=${encodeURIComponent(`${product.name} - ficha técnica.pdf`)}`}
+                            download
+                            className="inline-flex items-center gap-2 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                          >
+                            <FileDown className="h-4 w-4" />
+                            Descargar ficha técnica
+                          </a>
+                        ) : null}
                       </div>
                     </Reveal>
                   ))

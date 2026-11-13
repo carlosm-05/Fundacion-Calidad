@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MetalmecanicosRouteImport } from './routes/metalmecanicos'
 import { Route as ProductosServiciosRouteImport } from './routes/productos-servicios'
 import { Route as ApiCatalogImagesRouteImport } from './routes/api/catalog-images'
+import { Route as ApiCatalogTechnicalSheetsRouteImport } from './routes/api/catalog-technical-sheets'
 import { Route as ApiWompiEventRouteImport } from './routes/api/wompi-event'
 import { Route as CuentaComprasRouteImport } from './routes/cuenta/compras'
 import { Route as CuentaConfirmarRouteImport } from './routes/cuenta/confirmar'
@@ -61,6 +62,12 @@ const ApiCatalogImagesRoute = ApiCatalogImagesRouteImport.update({
   path: '/api/catalog-images',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCatalogTechnicalSheetsRoute =
+  ApiCatalogTechnicalSheetsRouteImport.update({
+    id: '/api/catalog-technical-sheets',
+    path: '/api/catalog-technical-sheets',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiWompiEventRoute = ApiWompiEventRouteImport.update({
   id: '/api/wompi-event',
   path: '/api/wompi-event',
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/metalmecanicos': typeof MetalmecanicosRoute
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
+  '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/metalmecanicos'
     | '/productos-servicios'
     | '/api/catalog-images'
+    | '/api/catalog-technical-sheets'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/metalmecanicos'
     | '/productos-servicios'
     | '/api/catalog-images'
+    | '/api/catalog-technical-sheets'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -208,6 +220,7 @@ export interface FileRouteTypes {
     | '/metalmecanicos'
     | '/productos-servicios'
     | '/api/catalog-images'
+    | '/api/catalog-technical-sheets'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -227,6 +240,7 @@ export interface RootRouteChildren {
   MetalmecanicosRoute: typeof MetalmecanicosRoute
   ProductosServiciosRoute: typeof ProductosServiciosRoute
   ApiCatalogImagesRoute: typeof ApiCatalogImagesRoute
+  ApiCatalogTechnicalSheetsRoute: typeof ApiCatalogTechnicalSheetsRoute
   ApiWompiEventRoute: typeof ApiWompiEventRoute
   CuentaComprasRoute: typeof CuentaComprasRoute
   CuentaConfirmarRoute: typeof CuentaConfirmarRoute
@@ -287,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/api/catalog-images'
       fullPath: '/api/catalog-images'
       preLoaderRoute: typeof ApiCatalogImagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/catalog-technical-sheets': {
+      id: '/api/catalog-technical-sheets'
+      path: '/api/catalog-technical-sheets'
+      fullPath: '/api/catalog-technical-sheets'
+      preLoaderRoute: typeof ApiCatalogTechnicalSheetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/wompi-event': {
@@ -363,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetalmecanicosRoute: MetalmecanicosRoute,
   ProductosServiciosRoute: ProductosServiciosRoute,
   ApiCatalogImagesRoute: ApiCatalogImagesRoute,
+  ApiCatalogTechnicalSheetsRoute: ApiCatalogTechnicalSheetsRoute,
   ApiWompiEventRoute: ApiWompiEventRoute,
   CuentaComprasRoute: CuentaComprasRoute,
   CuentaConfirmarRoute: CuentaConfirmarRoute,

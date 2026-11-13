@@ -1,9 +1,11 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createClient } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   Cog,
+  FileDown,
   Handshake,
   ImagePlus,
   Loader2,
@@ -78,6 +80,11 @@ type GalleryImage = {
   file?: File;
 };
 
+type TechnicalSheetDraft = {
+  url: string;
+  file?: File;
+};
+
 type CatalogDraft = {
   name: string;
   model: string;
@@ -85,12 +92,15 @@ type CatalogDraft = {
   price: string;
   purchasePriceCop: string;
   gallery: GalleryImage[];
+  technicalSheet: TechnicalSheetDraft | null;
   isActive: boolean;
 };
 
 const MAX_IMAGES = 8;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_TECHNICAL_SHEET_SIZE = 20 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const PDF_SIGNATURE = [0x25, 0x50, 0x44, 0x46, 0x2d];
 
 function createEmptyDraft(): CatalogDraft {
   return {
@@ -100,6 +110,7 @@ function createEmptyDraft(): CatalogDraft {
     price: "",
     purchasePriceCop: "",
     gallery: [],
+    technicalSheet: null,
     isActive: true,
   };
 }
@@ -124,6 +135,20 @@ const uploadErrors: Record<string, string> = {
   type: "Solo se aceptan archivos JPG, PNG o WebP válidos.",
   upload: "No se pudo subir la imagen. Verifica que la migración de Storage esté aplicada.",
 };
+
+const technicalSheetUploadErrors: Record<string, string> = {
+  config: "El almacenamiento de fichas técnicas no está configurado.",
+  invalid: "Selecciona un archivo PDF válido.",
+  size: "La ficha técnica debe pesar menos de 20 MB.",
+  type: "La ficha técnica debe ser un PDF válido.",
+  upload: "No se pudo subir la ficha técnica. Verifica que la migración de Storage esté aplicada.",
+};
+
+async function isValidPdfFile(file: File) {
+  if (file.type !== "application/pdf") return false;
+  const signature = new Uint8Array(await file.slice(0, PDF_SIGNATURE.length).arrayBuffer());
+  return PDF_SIGNATURE.every((byte, index) => signature[index] === byte);
+}
 
 function AdminPage() {
   const { user } = Route.useRouteContext();
@@ -499,6 +524,8 @@ function CatalogPanel({
   function startEditing(item: CatalogItem) {
     setEditingId(item.id);
     setEditorOpen(true);
+    const technicalSheetUrl =
+      kind === "product" ? (item as ProductRecord).technical_sheet_url : null;
     const purchasePriceCents =
       kind === "service" ? (item as ServiceRecord).price_amount_cents : null;
     setDraft({
@@ -511,6 +538,7 @@ function CatalogPanel({
         id: `${item.id}-${index}`,
         url,
       })),
+      technicalSheet: technicalSheetUrl ? { url: technicalSheetUrl } : null,
       isActive: item.is_active,
     });
     setError(null);
@@ -587,7 +615,9 @@ function CatalogPanel({
     setError(null);
     try {
       const gallery = [...draft.gallery];
-      const filesToUpload = gallery.filter((image) => image.file).length;
+      const hasNewTechnicalSheet = kind === "product" && Boolean(draft.technicalSheet?.file);
+      const filesToUpload =
+        gallery.filter((image) => image.file).length + Number(hasNewTechnicalSheet);
       let uploaded = 0;
       setUploadProgress(filesToUpload ? { current: 0, total: filesToUpload } : null);
 
@@ -632,6 +662,62 @@ function CatalogPanel({
         }));
       }
 
+      let technicalSheetUrl = kind === "product" ? draft.technicalSheet?.url || null : null;
+      const technicalSheetFile = kind === "product" ? draft.technicalSheet?.file : undefined;
+      if (technicalSheetFile) {
+        setUploadProgress({ current: uploaded + 1, total: filesToUpload });
+        const response = await fetch("/api/catalog-technical-sheets", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            fileSize: technicalSheetFile.size,
+            contentType: technicalSheetFile.type,
+          }),
+          credentials: "same-origin",
+        });
+        const responseBody: unknown = await response.json();
+        const parsed = z
+          .object({
+            ok: z.boolean(),
+            url: z.string().optional(),
+            path: z.string().optional(),
+            token: z.string().optional(),
+            supabaseUrl: z.string().optional(),
+            anonKey: z.string().optional(),
+            error: z.string().optional(),
+          })
+          .safeParse(responseBody);
+        if (!response.ok || !parsed.success || !parsed.data.ok) {
+          const code = parsed.success ? (parsed.data.error ?? "upload") : "upload";
+          throw new Error(technicalSheetUploadErrors[code] ?? technicalSheetUploadErrors["upload"]);
+        }
+        const { url, path, token, supabaseUrl, anonKey } = parsed.data;
+        if (!url || !path || !token || !supabaseUrl || !anonKey) {
+          throw new Error(technicalSheetUploadErrors["upload"]);
+        }
+        const supabase = createClient(supabaseUrl, anonKey, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+        });
+        const { error: uploadError } = await supabase.storage
+          .from("catalog-technical-sheets")
+          .uploadToSignedUrl(path, token, technicalSheetFile, {
+            cacheControl: "31536000",
+            contentType: "application/pdf",
+          });
+        if (uploadError) {
+          console.error("[catalogo] No se pudo cargar la ficha técnica:", uploadError);
+          throw new Error(technicalSheetUploadErrors["upload"]);
+        }
+
+        technicalSheetUrl = url;
+        setDraft((current) => ({ ...current, technicalSheet: { url } }));
+        uploaded += 1;
+      }
+
       setUploadProgress(null);
       const result = await saveCatalogItemFn({
         data: {
@@ -646,6 +732,7 @@ function CatalogPanel({
               ? Number(draft.purchasePriceCop)
               : null,
           gallery: gallery.map((image) => image.url),
+          technicalSheetUrl,
           isActive: draft.isActive,
         },
       });
@@ -893,6 +980,79 @@ function CatalogPanel({
                   disabled={saving}
                 />
 
+                {kind === "product" ? (
+                  <div className="space-y-2 rounded-xl border border-border/70 p-4">
+                    <div>
+                      <p className="text-sm font-medium">Ficha técnica (PDF, opcional)</p>
+                      <p className="text-xs text-muted-foreground">
+                        Hasta 20 MB. Los visitantes podrán descargarla desde el producto publicado.
+                      </p>
+                    </div>
+                    {draft.technicalSheet ? (
+                      <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 px-3 py-2">
+                        <div className="flex min-w-0 items-center gap-2 text-sm">
+                          <FileDown className="h-4 w-4 shrink-0 text-secondary" />
+                          {draft.technicalSheet.file ? (
+                            <span className="truncate">{draft.technicalSheet.file.name}</span>
+                          ) : (
+                            <a
+                              href={draft.technicalSheet.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="truncate text-primary underline-offset-4 hover:underline"
+                            >
+                              Ver ficha técnica actual
+                            </a>
+                          )}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Quitar ficha técnica"
+                          disabled={saving}
+                          onClick={() =>
+                            setDraft((current) => ({ ...current, technicalSheet: null }))
+                          }
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Este producto no tiene ficha técnica.
+                      </p>
+                    )}
+                    <Input
+                      type="file"
+                      accept="application/pdf,.pdf"
+                      aria-label="Seleccionar ficha técnica en PDF"
+                      disabled={saving}
+                      onChange={async (event) => {
+                        const file = event.currentTarget.files?.[0];
+                        event.currentTarget.value = "";
+                        if (!file) return;
+                        if (file.size < 1 || file.size > MAX_TECHNICAL_SHEET_SIZE) {
+                          setError("La ficha técnica debe pesar menos de 20 MB.");
+                          return;
+                        }
+                        if (!(await isValidPdfFile(file))) {
+                          setError("La ficha técnica debe ser un archivo PDF válido.");
+                          return;
+                        }
+                        setError(null);
+                        setDraft((current) => ({
+                          ...current,
+                          technicalSheet: {
+                            url: current.technicalSheet?.url ?? "",
+                            file,
+                          },
+                        }));
+                      }}
+                    />
+                  </div>
+                ) : null}
+
                 <label className="block space-y-1.5 text-sm font-medium">
                   Descripción
                   <Textarea
@@ -1014,6 +1174,12 @@ function CatalogPreview({ kind, draft }: { kind: CatalogKind; draft: CatalogDraf
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border p-6 sm:p-7">
               <PreviewPrice price={draft.price} />
+              {draft.technicalSheet ? (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-secondary">
+                  <FileDown className="h-4 w-4" />
+                  Ficha técnica PDF
+                </span>
+              ) : null}
             </div>
           </>
         ) : (
