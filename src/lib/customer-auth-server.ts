@@ -56,7 +56,9 @@ function createSupabaseClient(url: string, anonKey: string) {
 function getAppUrl() {
   const configuredUrl = env("APP_URL");
   if (!configuredUrl) {
-    return env("NODE_ENV") === "production" ? null : "http://localhost:8080";
+    return env("NODE_ENV") === "production"
+      ? "https://www.fundacioncalidad.org"
+      : "http://localhost:8080";
   }
 
   try {
