@@ -468,7 +468,12 @@ function DonationList({
                 {donation.donor_email} · {donation.donor_phone}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {new Date(donation.created_at).toLocaleString("es-CO")}
+                {donation.payment_method === "daviplata"
+                  ? "DaviPlata"
+                  : donation.payment_method === "paypal"
+                    ? "PayPal"
+                    : "Wompi"}{" "}
+                · {new Date(donation.created_at).toLocaleString("es-CO")}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
                 Referencia: {donation.payment_reference}
@@ -479,7 +484,9 @@ function DonationList({
             </div>
             <div className="text-sm sm:text-right">
               <p className="font-semibold text-foreground">
-                {formatPurchasePrice(donation.amount_cents, donation.currency)}
+                {donation.amount_cents === null
+                  ? "Monto elegido en PayPal"
+                  : formatPurchasePrice(donation.amount_cents, donation.currency)}
               </p>
               <p className="mt-1 capitalize text-muted-foreground">
                 {donation.status} · pago {donation.payment_status}

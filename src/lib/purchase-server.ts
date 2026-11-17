@@ -187,6 +187,7 @@ export const startDonationCheckoutFn = createServerFn({ method: "POST" })
         donor_phone: data.telefono,
         amount_cents: amountCents,
         currency: "COP",
+        payment_method: "wompi",
         payment_reference: paymentReference,
       })
       .select("id")
@@ -210,6 +211,70 @@ export const startDonationCheckoutFn = createServerFn({ method: "POST" })
     checkout.searchParams.set("customer-data:full-name", data.nombre);
 
     return { ok: true, checkoutUrl: checkout.toString() };
+  });
+
+const donorRegistrationBaseSchema = z.object({
+  nombre: z.string().trim().min(1).max(200),
+  correo: z.string().trim().email().max(320),
+  telefono: z
+    .string()
+    .trim()
+    .min(7)
+    .max(50)
+    .refine((value) => (value.match(/\d/g)?.length ?? 0) >= 7),
+  website: z.string().max(0).optional(),
+});
+
+const registerDonationSchema = z.discriminatedUnion("metodo", [
+  donorRegistrationBaseSchema.extend({
+    metodo: z.literal("daviplata"),
+    monto: z.number().int().min(1000).max(100_000_000),
+  }),
+  donorRegistrationBaseSchema.extend({
+    metodo: z.literal("paypal"),
+  }),
+]);
+
+export type RegisterDonationResult =
+  | { ok: true; donationId: string; paymentReference: string }
+  | { ok: false; error: "config" | "database" };
+
+export const registerOfflineDonationFn = createServerFn({ method: "POST" })
+  .validator((input: z.infer<typeof registerDonationSchema>) => registerDonationSchema.parse(input))
+  .handler(async ({ data }): Promise<RegisterDonationResult> => {
+    if (data.website) return { ok: false, error: "database" };
+
+    const supabase = getSupabaseAdminClient();
+    if (!supabase) return { ok: false, error: "config" };
+
+    const isDaviplata = data.metodo === "daviplata";
+    const paymentReference = `${isDaviplata ? "davi" : "paypal"}_${crypto.randomUUID().replaceAll("-", "")}`;
+    const amountCents = isDaviplata ? data.monto * 100 : null;
+    const currency = isDaviplata ? "COP" : "USD";
+    const { data: donation, error } = await supabase
+      .from("donations")
+      .insert({
+        donor_name: data.nombre,
+        donor_email: data.correo,
+        donor_phone: data.telefono,
+        amount_cents: amountCents,
+        currency,
+        payment_method: data.metodo,
+        payment_reference: paymentReference,
+      })
+      .select("id,payment_reference")
+      .single();
+
+    if (error || !donation) {
+      console.error("[donaciones] No se pudo registrar la intención:", error);
+      return { ok: false, error: "database" };
+    }
+
+    return {
+      ok: true,
+      donationId: donation.id,
+      paymentReference: donation.payment_reference,
+    };
   });
 
 export type CustomerPurchase = Purchase;
@@ -342,10 +407,12 @@ export const getAdminPurchasesFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export type AdminDonation = DonationPaymentStatus & {
+export type AdminDonation = Omit<DonationPaymentStatus, "amount_cents"> & {
+  amount_cents: number | null;
   donor_name: string;
   donor_email: string;
   donor_phone: string;
+  payment_method: "wompi" | "daviplata" | "paypal";
   payment_transaction_id: string | null;
 };
 
@@ -362,7 +429,7 @@ export const getAdminDonationsFn = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase
       .from("donations")
       .select(
-        "id,donor_name,donor_email,donor_phone,amount_cents,currency,status,payment_status,payment_reference,payment_transaction_id,created_at",
+        "id,donor_name,donor_email,donor_phone,amount_cents,currency,status,payment_status,payment_method,payment_reference,payment_transaction_id,created_at",
       )
       .order("created_at", { ascending: false })
       .limit(500);

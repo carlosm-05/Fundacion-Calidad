@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { CheckCircle2, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { CheckCircle2, Copy, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { donation } from "@/content/site";
-import { sendDonationReportFn } from "@/lib/contact-server";
-import { startDonationCheckoutFn } from "@/lib/purchase-server";
+import { registerOfflineDonationFn, startDonationCheckoutFn } from "@/lib/purchase-server";
 
 type DonationMethodId = "wompi" | "daviplata" | "paypal";
 type ReportStatus = "idle" | "sending" | "success" | "error" | "config";
@@ -33,7 +32,7 @@ export function DonationOptions() {
   const [status, setStatus] = useState<ReportStatus>("idle");
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
-  const [hasReportedIntent, setHasReportedIntent] = useState(false);
+  const [hasRegisteredDonor, setHasRegisteredDonor] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const selectedMethod =
@@ -52,7 +51,7 @@ export function DonationOptions() {
 
   function updateAmount(nextAmount: string) {
     setAmount(nextAmount);
-    setHasReportedIntent(false);
+    setHasRegisteredDonor(false);
     if (status !== "sending") setStatus("idle");
   }
 
@@ -61,11 +60,11 @@ export function DonationOptions() {
     if (!nextMethod) return;
     setMethodId(nextMethodId);
     updateAmount(String(nextMethod.presets[0]));
-    setHasReportedIntent(false);
+    setHasRegisteredDonor(false);
     setStatus("idle");
   }
 
-  function openDonationDialog(nextMethodId: "wompi" | "daviplata") {
+  function openDonationDialog(nextMethodId: DonationMethodId) {
     if (nextMethodId !== methodId) chooseMethod(nextMethodId);
     setDialogOpen(true);
   }
@@ -82,9 +81,9 @@ export function DonationOptions() {
     }
   }
 
-  async function submitReport(event: FormEvent<HTMLFormElement>) {
+  async function submitDonorDetails(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (selectedMethod.id === "paypal" || status === "sending" || !isReady) return;
+    if (status === "sending" || !isReady) return;
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -108,20 +107,28 @@ export function DonationOptions() {
         return;
       }
 
-      const result = await sendDonationReportFn({
-        data: {
-          nombre: String(formData.get("nombre") ?? ""),
-          correo: String(formData.get("correo") ?? ""),
-          telefono: String(formData.get("telefono") ?? ""),
-          metodo: selectedMethod.id,
-          moneda: selectedMethod.currency,
-          monto: numericAmount,
-          website: String(formData.get("website") ?? ""),
-        },
-      });
+      const donor = {
+        nombre: String(formData.get("nombre") ?? ""),
+        correo: String(formData.get("correo") ?? ""),
+        telefono: String(formData.get("telefono") ?? ""),
+        website: String(formData.get("website") ?? ""),
+      };
+
+      const result =
+        selectedMethod.id === "daviplata"
+          ? await registerOfflineDonationFn({
+              data: { ...donor, metodo: "daviplata", monto: numericAmount },
+            })
+          : await registerOfflineDonationFn({
+              data: { ...donor, metodo: "paypal" },
+            });
       if (result.ok) {
+        if (selectedMethod.id === "paypal" && selectedMethod.link) {
+          window.location.assign(selectedMethod.link);
+          return;
+        }
         setStatus("success");
-        setHasReportedIntent(true);
+        setHasRegisteredDonor(true);
         return;
       }
       setStatus(result.error === "config" ? "config" : "error");
@@ -213,27 +220,17 @@ export function DonationOptions() {
                 </p>
               </div>
             ) : null}
-            {method.id === "paypal" ? (
-              method.link ? (
-                <a
-                  href={method.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
-                >
-                  Donar con PayPal
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              ) : null
-            ) : (
-              <Button
-                type="button"
-                className="mt-5 w-full"
-                onClick={() => openDonationDialog(method.id)}
-              >
-                {method.id === "wompi" ? "Pagar con Wompi" : "Donar con DaviPlata"}
-              </Button>
-            )}
+            <Button
+              type="button"
+              className="mt-5 w-full"
+              onClick={() => openDonationDialog(method.id)}
+            >
+              {method.id === "wompi"
+                ? "Donar con Wompi"
+                : method.id === "daviplata"
+                  ? "Donar con DaviPlata"
+                  : "Donar con PayPal"}
+            </Button>
           </div>
         ))}
       </div>
@@ -243,17 +240,18 @@ export function DonationOptions() {
           <DialogHeader>
             <DialogTitle>Datos para continuar con tu donación</DialogTitle>
             <DialogDescription>
-              {selectedMethod.name} · {formatAmount(numericAmount, selectedMethod.currency)}.
-              Ingresa tus datos para continuar.
+              {selectedMethod.id === "paypal"
+                ? "Completa tus datos. El monto lo elegirás directamente en PayPal."
+                : `${selectedMethod.name} · ${formatAmount(numericAmount, selectedMethod.currency)}. Ingresa tus datos para continuar.`}
             </DialogDescription>
           </DialogHeader>
 
           {status === "success" ? (
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
-              <AlertTitle>Aviso enviado a la Fundación</AlertTitle>
+              <AlertTitle>Datos guardados</AlertTitle>
               <AlertDescription>
-                El aviso no confirma que el dinero haya sido enviado o recibido.
+                Completa la transferencia a la cuenta que aparece a continuación.
               </AlertDescription>
             </Alert>
           ) : null}
@@ -262,7 +260,7 @@ export function DonationOptions() {
               <AlertTitle>
                 {selectedMethod.id === "wompi"
                   ? "No se pudo iniciar el pago"
-                  : "No se pudo enviar el reporte"}
+                  : "No se pudieron guardar los datos"}
               </AlertTitle>
               <AlertDescription>
                 {selectedMethod.id === "wompi"
@@ -270,17 +268,17 @@ export function DonationOptions() {
                     ? "El checkout de Wompi aún no está configurado. Inténtalo más tarde o usa una transferencia manual."
                     : "No se pudo iniciar el checkout. Inténtalo de nuevo más tarde."
                   : status === "config"
-                    ? "El correo de notificación aún no está configurado."
-                    : "Inténtalo de nuevo más tarde o contáctanos directamente."}
+                    ? "El registro de donantes no está configurado en el servidor."
+                    : "No se pudo guardar el registro. Inténtalo de nuevo más tarde."}
               </AlertDescription>
             </Alert>
           ) : null}
 
           <form
-            onSubmit={submitReport}
+            onSubmit={submitDonorDetails}
             onChange={() => {
-              if (hasReportedIntent) {
-                setHasReportedIntent(false);
+              if (hasRegisteredDonor) {
+                setHasRegisteredDonor(false);
                 setStatus("idle");
               }
             }}
@@ -334,17 +332,19 @@ export function DonationOptions() {
                   status === "sending" ||
                   !isReady ||
                   !Number.isFinite(numericAmount) ||
-                  hasReportedIntent
+                  hasRegisteredDonor
                 }
               >
                 {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {status === "sending"
                   ? selectedMethod.id === "wompi"
                     ? "Preparando pago…"
-                    : "Enviando aviso…"
+                    : "Guardando datos…"
                   : selectedMethod.id === "wompi"
                     ? "Pagar con Wompi"
-                    : "Avisar a la Fundación"}
+                    : selectedMethod.id === "daviplata"
+                      ? "Guardar datos y ver cuenta"
+                      : "Guardar datos y continuar a PayPal"}
               </Button>
               {!isReady ? (
                 <p className="mt-2 text-center text-xs text-muted-foreground">
@@ -354,7 +354,7 @@ export function DonationOptions() {
             </div>
           </form>
 
-          {hasReportedIntent && selectedMethod.id === "daviplata" ? (
+          {hasRegisteredDonor && selectedMethod.id === "daviplata" ? (
             <div className="rounded-xl border border-border bg-muted/40 p-4">
               <p className="text-sm font-medium text-foreground">
                 Transfiere {formatAmount(numericAmount, selectedMethod.currency)} a{" "}

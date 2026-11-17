@@ -544,7 +544,7 @@ export const location = {
  * Reemplace cada `link` (o nº de cuenta) por la información real de la
  * Fundación. El botón "Donar" lleva a la página /donacion.
  */
-const daviplataReceiver = import.meta.env["VITE_DAVIPLATA_RECEIVER"]?.trim() ?? "";
+const daviplataReceiver = "0550108900905937";
 const daviplataHolder = import.meta.env["VITE_DAVIPLATA_HOLDER"]?.trim() ?? "";
 const paypalDonationUrl = "https://paypal.me/fundacioncalidad";
 

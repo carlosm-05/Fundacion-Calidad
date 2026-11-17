@@ -3,8 +3,12 @@ create table if not exists public.donations (
   donor_name text not null,
   donor_email text not null,
   donor_phone text not null,
-  amount_cents bigint not null check (amount_cents between 100000 and 10000000000),
-  currency text not null default 'COP' check (currency = 'COP'),
+  amount_cents bigint check (
+    amount_cents is null or amount_cents between 100000 and 10000000000
+  ),
+  currency text not null default 'COP' check (currency in ('COP', 'USD')),
+  payment_method text not null default 'wompi'
+    check (payment_method in ('wompi', 'daviplata', 'paypal')),
   status text not null default 'pending'
     check (status in ('pending', 'paid', 'cancelled', 'failed')),
   payment_status text not null default 'pending'
