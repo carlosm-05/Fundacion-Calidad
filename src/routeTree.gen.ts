@@ -17,6 +17,7 @@ import { Route as MetalmecanicosRouteImport } from './routes/metalmecanicos'
 import { Route as ProductosServiciosRouteImport } from './routes/productos-servicios'
 import { Route as ApiCatalogImagesRouteImport } from './routes/api/catalog-images'
 import { Route as ApiCatalogTechnicalSheetsRouteImport } from './routes/api/catalog-technical-sheets'
+import { Route as ApiPaypalEventRouteImport } from './routes/api/paypal-event'
 import { Route as ApiWompiEventRouteImport } from './routes/api/wompi-event'
 import { Route as CuentaComprasRouteImport } from './routes/cuenta/compras'
 import { Route as CuentaConfirmarRouteImport } from './routes/cuenta/confirmar'
@@ -68,6 +69,11 @@ const ApiCatalogTechnicalSheetsRoute =
     path: '/api/catalog-technical-sheets',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPaypalEventRoute = ApiPaypalEventRouteImport.update({
+  id: '/api/paypal-event',
+  path: '/api/paypal-event',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiWompiEventRoute = ApiWompiEventRouteImport.update({
   id: '/api/wompi-event',
   path: '/api/wompi-event',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
   '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
+  '/api/paypal-event': typeof ApiPaypalEventRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
   '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
+  '/api/paypal-event': typeof ApiPaypalEventRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/productos-servicios': typeof ProductosServiciosRoute
   '/api/catalog-images': typeof ApiCatalogImagesRoute
   '/api/catalog-technical-sheets': typeof ApiCatalogTechnicalSheetsRoute
+  '/api/paypal-event': typeof ApiPaypalEventRoute
   '/api/wompi-event': typeof ApiWompiEventRoute
   '/cuenta/compras': typeof CuentaComprasRoute
   '/cuenta/confirmar': typeof CuentaConfirmarRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/productos-servicios'
     | '/api/catalog-images'
     | '/api/catalog-technical-sheets'
+    | '/api/paypal-event'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/productos-servicios'
     | '/api/catalog-images'
     | '/api/catalog-technical-sheets'
+    | '/api/paypal-event'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/productos-servicios'
     | '/api/catalog-images'
     | '/api/catalog-technical-sheets'
+    | '/api/paypal-event'
     | '/api/wompi-event'
     | '/cuenta/compras'
     | '/cuenta/confirmar'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   ProductosServiciosRoute: typeof ProductosServiciosRoute
   ApiCatalogImagesRoute: typeof ApiCatalogImagesRoute
   ApiCatalogTechnicalSheetsRoute: typeof ApiCatalogTechnicalSheetsRoute
+  ApiPaypalEventRoute: typeof ApiPaypalEventRoute
   ApiWompiEventRoute: typeof ApiWompiEventRoute
   CuentaComprasRoute: typeof CuentaComprasRoute
   CuentaConfirmarRoute: typeof CuentaConfirmarRoute
@@ -308,6 +321,13 @@ declare module '@tanstack/react-router' {
       path: '/api/catalog-technical-sheets'
       fullPath: '/api/catalog-technical-sheets'
       preLoaderRoute: typeof ApiCatalogTechnicalSheetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/paypal-event': {
+      id: '/api/paypal-event'
+      path: '/api/paypal-event'
+      fullPath: '/api/paypal-event'
+      preLoaderRoute: typeof ApiPaypalEventRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/wompi-event': {
@@ -385,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductosServiciosRoute: ProductosServiciosRoute,
   ApiCatalogImagesRoute: ApiCatalogImagesRoute,
   ApiCatalogTechnicalSheetsRoute: ApiCatalogTechnicalSheetsRoute,
+  ApiPaypalEventRoute: ApiPaypalEventRoute,
   ApiWompiEventRoute: ApiWompiEventRoute,
   CuentaComprasRoute: CuentaComprasRoute,
   CuentaConfirmarRoute: CuentaConfirmarRoute,

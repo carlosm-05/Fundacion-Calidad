@@ -58,6 +58,28 @@ function getWompiConfig() {
   return { publicKey, integritySecret, eventsSecret, environment };
 }
 
+function getPayPalConfig() {
+  const clientId = env("PAYPAL_CLIENT_ID");
+  const clientSecret = env("PAYPAL_CLIENT_SECRET");
+  const webhookId = env("PAYPAL_WEBHOOK_ID");
+  const environment = env("PAYPAL_ENVIRONMENT");
+  if (
+    !clientId ||
+    !clientSecret ||
+    !webhookId ||
+    (environment !== "sandbox" && environment !== "live")
+  ) {
+    return null;
+  }
+  return {
+    clientId,
+    clientSecret,
+    webhookId,
+    apiBaseUrl:
+      environment === "live" ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com",
+  };
+}
+
 async function sha256(value: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -674,5 +696,218 @@ export async function processWompiEvent(input: unknown) {
     console.error("[compras] No se pudo actualizar el estado del pago:", updateError);
     return { ok: false as const, status: 500 };
   }
+  return { ok: true as const };
+}
+
+const payPalWebhookSchema = z.object({
+  event_type: z.string().min(1),
+  resource: z.record(z.string(), z.unknown()),
+});
+
+const payPalAccessTokenSchema = z.object({
+  access_token: z.string().min(1),
+});
+
+const payPalWebhookVerificationSchema = z.object({
+  verification_status: z.enum(["SUCCESS", "FAILURE"]),
+});
+
+async function getPayPalAccessToken(config: NonNullable<ReturnType<typeof getPayPalConfig>>) {
+  let response: Response;
+  try {
+    response = await fetch(`${config.apiBaseUrl}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        authorization: `Basic ${btoa(`${config.clientId}:${config.clientSecret}`)}`,
+        accept: "application/json",
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      body: "grant_type=client_credentials",
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    console.error("[paypal] No se pudo conectar para obtener el token OAuth.");
+    return null;
+  }
+
+  if (!response.ok) {
+    console.error("[paypal] Falló la autenticación OAuth:", response.status);
+    return null;
+  }
+
+  let payload: unknown;
+  try {
+    payload = await response.json();
+  } catch {
+    console.error("[paypal] La respuesta OAuth no contenía JSON válido.");
+    return null;
+  }
+  const parsed = payPalAccessTokenSchema.safeParse(payload);
+  if (!parsed.success) {
+    console.error("[paypal] La respuesta OAuth no incluyó un token.");
+    return null;
+  }
+  return parsed.data.access_token;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export async function processPayPalEvent(headers: Headers, payload: unknown) {
+  const config = getPayPalConfig();
+  if (!config) return { ok: false as const, status: 503 };
+
+  const parsed = payPalWebhookSchema.safeParse(payload);
+  if (!parsed.success) return { ok: false as const, status: 400 };
+
+  const authAlgo = headers.get("paypal-auth-algo");
+  const certUrl = headers.get("paypal-cert-url");
+  const transmissionId = headers.get("paypal-transmission-id");
+  const transmissionSignature = headers.get("paypal-transmission-sig");
+  const transmissionTime = headers.get("paypal-transmission-time");
+  if (!authAlgo || !certUrl || !transmissionId || !transmissionSignature || !transmissionTime) {
+    return { ok: false as const, status: 400 };
+  }
+
+  const accessToken = await getPayPalAccessToken(config);
+  if (!accessToken) return { ok: false as const, status: 503 };
+
+  let verificationResponse: Response;
+  try {
+    verificationResponse = await fetch(
+      `${config.apiBaseUrl}/v1/notifications/verify-webhook-signature`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          accept: "application/json",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          auth_algo: authAlgo,
+          cert_url: certUrl,
+          transmission_id: transmissionId,
+          transmission_sig: transmissionSignature,
+          transmission_time: transmissionTime,
+          webhook_id: config.webhookId,
+          webhook_event: payload,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      },
+    );
+  } catch {
+    console.error("[paypal] No se pudo verificar la firma del webhook.");
+    return { ok: false as const, status: 503 };
+  }
+
+  if (!verificationResponse.ok) {
+    console.error("[paypal] Falló la verificación del webhook:", verificationResponse.status);
+    return { ok: false as const, status: 503 };
+  }
+
+  let verificationPayload: unknown;
+  try {
+    verificationPayload = await verificationResponse.json();
+  } catch {
+    console.error("[paypal] La respuesta de verificación no contenía JSON válido.");
+    return { ok: false as const, status: 503 };
+  }
+  const verification = payPalWebhookVerificationSchema.safeParse(verificationPayload);
+  if (!verification.success) return { ok: false as const, status: 503 };
+  if (verification.data.verification_status !== "SUCCESS") {
+    console.warn("[paypal] Se rechazó un webhook con firma no válida.");
+    return { ok: false as const, status: 401 };
+  }
+
+  const event = parsed.data;
+  if (event.event_type !== "PAYMENT.CAPTURE.COMPLETED") return { ok: true as const };
+
+  const resource = event.resource;
+  if (resource["status"] !== "COMPLETED") return { ok: true as const };
+  const captureId = resource["id"];
+  const customId = resource["custom_id"];
+  const invoiceId = resource["invoice_id"];
+  if (
+    typeof captureId !== "string" ||
+    (customId !== undefined && typeof customId !== "string") ||
+    (invoiceId !== undefined && typeof invoiceId !== "string")
+  ) {
+    return { ok: true as const };
+  }
+  if (customId && invoiceId && customId !== invoiceId) {
+    console.warn("[paypal] El webhook no se pudo asociar a una referencia única.");
+    return { ok: true as const };
+  }
+  const paymentReference = customId || invoiceId;
+  if (!paymentReference) {
+    console.warn("[paypal] Captura verificada sin referencia interna; requiere revisión manual.");
+    return { ok: true as const };
+  }
+
+  const amountData = isRecord(resource["amount"]) ? resource["amount"] : null;
+  const amountValue = amountData?.["value"];
+  const currencyCode = amountData?.["currency_code"];
+  const amount = typeof amountValue === "string" ? Number(amountValue) : Number.NaN;
+  const amountCents = Math.round(amount * 100);
+  if (
+    currencyCode !== "USD" ||
+    !Number.isSafeInteger(amountCents) ||
+    amountCents < 100 ||
+    amountCents > 10_000_000_000 ||
+    Math.abs(amount * 100 - amountCents) > 0.000001
+  ) {
+    console.warn("[paypal] Captura verificada con importe o moneda no admitidos.");
+    return { ok: true as const };
+  }
+
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return { ok: false as const, status: 503 };
+
+  const { data: donation, error: loadError } = await supabase
+    .from("donations")
+    .select("id,status,payment_method,currency,amount_cents,payment_transaction_id")
+    .eq("payment_reference", paymentReference)
+    .maybeSingle();
+  if (loadError) {
+    console.error("[paypal] No se pudo cargar la donación vinculada al pago:", loadError);
+    return { ok: false as const, status: 500 };
+  }
+  if (!donation || donation.payment_method !== "paypal" || donation.currency !== "USD") {
+    console.warn("[paypal] Captura verificada sin una donación PayPal coincidente.");
+    return { ok: true as const };
+  }
+  if (donation.payment_transaction_id === captureId && donation.status === "paid") {
+    return { ok: true as const };
+  }
+  if (donation.status !== "pending" || donation.payment_transaction_id) {
+    console.warn("[paypal] La donación vinculada ya no está pendiente.");
+    return { ok: true as const };
+  }
+  if (donation.amount_cents !== null && Number(donation.amount_cents) !== amountCents) {
+    console.warn("[paypal] El importe del pago no coincide con el registro.");
+    return { ok: true as const };
+  }
+
+  const { data: updatedDonation, error: updateError } = await supabase
+    .from("donations")
+    .update({
+      amount_cents: amountCents,
+      status: "paid",
+      payment_status: "approved",
+      payment_transaction_id: captureId,
+    })
+    .eq("id", donation.id)
+    .eq("status", "pending")
+    .eq("payment_method", "paypal")
+    .eq("currency", "USD")
+    .is("payment_transaction_id", null)
+    .select("id")
+    .maybeSingle();
+  if (updateError) {
+    console.error("[paypal] No se pudo aprobar la donación verificada:", updateError);
+    return { ok: false as const, status: 500 };
+  }
+  if (!updatedDonation) return { ok: true as const };
   return { ok: true as const };
 }
