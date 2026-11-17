@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
+  CheckCircle2,
   Cog,
   FileDown,
   Handshake,
@@ -15,6 +16,7 @@ import {
   ShieldCheck,
   Trash2,
   X,
+  XCircle,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -45,6 +47,7 @@ import {
 import {
   getAdminDonationsFn,
   getAdminPurchasesFn,
+  reviewOfflineDonationFn,
   type AdminDonation,
   type AdminPurchase,
 } from "@/lib/purchase-server";
@@ -164,6 +167,8 @@ function AdminPage() {
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [donations, setDonations] = useState<AdminDonation[]>([]);
   const [donationError, setDonationError] = useState<string | null>(null);
+  const [donationReviewError, setDonationReviewError] = useState<string | null>(null);
+  const [reviewingDonationId, setReviewingDonationId] = useState<string | null>(null);
 
   const refreshCatalog = useCallback(async () => {
     setLoading(true);
@@ -201,6 +206,47 @@ function AdminPage() {
       await navigate({ to: "/login" });
     } finally {
       setLogoutPending(false);
+    }
+  }
+
+  async function reviewDonation(donation: AdminDonation, action: "approve" | "reject") {
+    const confirmation =
+      action === "approve"
+        ? `Confirma que verificaste la recepción del pago de ${donation.donor_name} fuera del sitio?`
+        : `Confirma que este registro de ${donation.donor_name} no corresponde a un pago recibido?`;
+    if (!window.confirm(confirmation)) return;
+
+    setReviewingDonationId(donation.id);
+    setDonationReviewError(null);
+    try {
+      const result = await reviewOfflineDonationFn({
+        data: { donationId: donation.id, action },
+      });
+      if (!result.ok) {
+        const messages = {
+          unauthorized: "Tu sesión ya no está autorizada. Inicia sesión de nuevo.",
+          config: "La base de datos no está configurada para revisar donaciones.",
+          database: "No se pudo actualizar el estado de la donación.",
+          not_found: "No se encontró esta donación.",
+          not_pending: "La donación ya no está pendiente. Actualiza la lista.",
+          unsupported_method: "Solo se revisan donaciones de DaviPlata o PayPal.",
+        } satisfies Record<typeof result.error, string>;
+        setDonationReviewError(messages[result.error]);
+        return;
+      }
+
+      setDonations((currentDonations) =>
+        currentDonations.map((item) =>
+          item.id === donation.id
+            ? { ...item, status: result.status, payment_status: result.payment_status }
+            : item,
+        ),
+      );
+    } catch (error) {
+      console.error("[admin] No se pudo revisar la donación:", error);
+      setDonationReviewError("No se pudo actualizar el estado de la donación.");
+    } finally {
+      setReviewingDonationId(null);
     }
   }
 
@@ -328,6 +374,9 @@ function AdminPage() {
                 <DonationList
                   donations={donations}
                   error={donationError}
+                  reviewError={donationReviewError}
+                  reviewingDonationId={reviewingDonationId}
+                  onReview={(donation, action) => void reviewDonation(donation, action)}
                   onRetry={() => {
                     setDonationError(null);
                     void getAdminDonationsFn()
@@ -429,72 +478,121 @@ function PurchaseList({
 function DonationList({
   donations,
   error,
+  reviewError,
+  reviewingDonationId,
+  onReview,
   onRetry,
 }: {
   donations: AdminDonation[];
   error: string | null;
+  reviewError: string | null;
+  reviewingDonationId: string | null;
+  onReview: (donation: AdminDonation, action: "approve" | "reject") => void;
   onRetry: () => void;
 }) {
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertTitle>No se pudieron cargar las donaciones</AlertTitle>
-        <AlertDescription className="flex items-center gap-3">
-          {error}
-          <button type="button" className="font-semibold underline" onClick={onRetry}>
-            Reintentar
-          </button>
-        </AlertDescription>
-      </Alert>
-    );
-  }
-  if (!donations.length) {
-    return (
-      <Card>
-        <CardContent className="py-8 text-sm text-muted-foreground">
-          Todavía no hay donaciones registradas.
-        </CardContent>
-      </Card>
-    );
-  }
   return (
     <div className="space-y-3">
-      {donations.map((donation) => (
-        <Card key={donation.id} className="border-border/70">
-          <CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground">{donation.donor_name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {donation.donor_email} · {donation.donor_phone}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {donation.payment_method === "daviplata"
-                  ? "DaviPlata"
-                  : donation.payment_method === "paypal"
-                    ? "PayPal"
-                    : "Wompi"}{" "}
-                · {new Date(donation.created_at).toLocaleString("es-CO")}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Referencia: {donation.payment_reference}
-                {donation.payment_transaction_id
-                  ? ` · Transacción: ${donation.payment_transaction_id}`
-                  : ""}
-              </p>
-            </div>
-            <div className="text-sm sm:text-right">
-              <p className="font-semibold text-foreground">
-                {donation.amount_cents === null
-                  ? "Monto elegido en PayPal"
-                  : formatPurchasePrice(donation.amount_cents, donation.currency)}
-              </p>
-              <p className="mt-1 capitalize text-muted-foreground">
-                {donation.status} · pago {donation.payment_status}
-              </p>
-            </div>
+      <p className="text-sm text-muted-foreground">
+        Verifica el abono en la cuenta antes de aprobar DaviPlata o PayPal. Wompi se actualiza
+        automáticamente con la notificación de la pasarela.
+      </p>
+      {reviewError ? (
+        <Alert variant="destructive">
+          <AlertTitle>No se pudo revisar la donación</AlertTitle>
+          <AlertDescription>{reviewError}</AlertDescription>
+        </Alert>
+      ) : null}
+      {error ? (
+        <Alert variant="destructive">
+          <AlertTitle>No se pudieron cargar las donaciones</AlertTitle>
+          <AlertDescription className="flex items-center gap-3">
+            {error}
+            <button type="button" className="font-semibold underline" onClick={onRetry}>
+              Reintentar
+            </button>
+          </AlertDescription>
+        </Alert>
+      ) : donations.length ? (
+        donations.map((donation) => {
+          const canReview =
+            donation.status === "pending" &&
+            (donation.payment_method === "daviplata" || donation.payment_method === "paypal");
+          const isReviewing = reviewingDonationId === donation.id;
+          return (
+            <Card key={donation.id} className="border-border/70">
+              <CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground">{donation.donor_name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {donation.donor_email} · {donation.donor_phone}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {donation.payment_method === "daviplata"
+                      ? "DaviPlata"
+                      : donation.payment_method === "paypal"
+                        ? "PayPal"
+                        : "Wompi"}{" "}
+                    · {new Date(donation.created_at).toLocaleString("es-CO")}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Referencia: {donation.payment_reference}
+                    {donation.payment_transaction_id
+                      ? ` · Transacción: ${donation.payment_transaction_id}`
+                      : ""}
+                  </p>
+                </div>
+                <div className="text-sm sm:text-right">
+                  <p className="font-semibold text-foreground">
+                    {donation.amount_cents === null
+                      ? "Monto elegido en PayPal"
+                      : formatPurchasePrice(donation.amount_cents, donation.currency)}
+                  </p>
+                  <p className="mt-1 capitalize text-muted-foreground">
+                    {donation.status} · pago {donation.payment_status}
+                  </p>
+                  {canReview ? (
+                    <div className="mt-3 flex flex-wrap gap-2 sm:justify-end">
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={reviewingDonationId !== null}
+                        onClick={() => onReview(donation, "approve")}
+                      >
+                        {isReviewing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4" />
+                        )}
+                        Aprobar pago
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={reviewingDonationId !== null}
+                        onClick={() => onReview(donation, "reject")}
+                      >
+                        {isReviewing ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <XCircle className="h-4 w-4" />
+                        )}
+                        Rechazar
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })
+      ) : (
+        <Card>
+          <CardContent className="py-8 text-sm text-muted-foreground">
+            Todavía no hay donaciones registradas.
           </CardContent>
         </Card>
-      ))}
+      )}
     </div>
   );
 }

@@ -277,6 +277,66 @@ export const registerOfflineDonationFn = createServerFn({ method: "POST" })
     };
   });
 
+const reviewDonationSchema = z.object({
+  donationId: z.string().uuid(),
+  action: z.enum(["approve", "reject"]),
+});
+
+export type AdminDonationReviewResult =
+  | {
+      ok: true;
+      status: "paid" | "failed";
+      payment_status: "approved" | "declined";
+    }
+  | {
+      ok: false;
+      error:
+        "unauthorized" | "config" | "database" | "not_found" | "not_pending" | "unsupported_method";
+    };
+
+export const reviewOfflineDonationFn = createServerFn({ method: "POST" })
+  .validator((input: z.infer<typeof reviewDonationSchema>) => reviewDonationSchema.parse(input))
+  .handler(async ({ data }): Promise<AdminDonationReviewResult> => {
+    const session = await getAdminSessionForServer();
+    if (!session.user) return { ok: false, error: "unauthorized" };
+
+    const supabase = getSupabaseAdminClient();
+    if (!supabase) return { ok: false, error: "config" };
+
+    const { data: donation, error: loadError } = await supabase
+      .from("donations")
+      .select("id,status,payment_method")
+      .eq("id", data.donationId)
+      .maybeSingle();
+    if (loadError) {
+      console.error("[donaciones] No se pudo cargar la donación para revisión:", loadError);
+      return { ok: false, error: "database" };
+    }
+    if (!donation) return { ok: false, error: "not_found" };
+    if (donation.payment_method !== "daviplata" && donation.payment_method !== "paypal") {
+      return { ok: false, error: "unsupported_method" };
+    }
+    if (donation.status !== "pending") return { ok: false, error: "not_pending" };
+
+    const status = data.action === "approve" ? "paid" : "failed";
+    const paymentStatus = data.action === "approve" ? "approved" : "declined";
+    const { data: updatedDonation, error: updateError } = await supabase
+      .from("donations")
+      .update({ status, payment_status: paymentStatus })
+      .eq("id", donation.id)
+      .eq("status", "pending")
+      .in("payment_method", ["daviplata", "paypal"])
+      .select("id")
+      .maybeSingle();
+
+    if (updateError) {
+      console.error("[donaciones] No se pudo actualizar el estado de la donación:", updateError);
+      return { ok: false, error: "database" };
+    }
+    if (!updatedDonation) return { ok: false, error: "not_pending" };
+    return { ok: true, status, payment_status: paymentStatus };
+  });
+
 export type CustomerPurchase = Purchase;
 
 export const getCustomerPurchasesFn = createServerFn({ method: "GET" }).handler(
