@@ -4,7 +4,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CustomerAuthShell } from "@/components/CustomerAuthShell";
 import { customerSessionFn } from "@/lib/customer-auth-server";
-import { getCustomerPurchaseFn, getDonationPaymentStatusFn } from "@/lib/purchase-server";
+import {
+  capturePayPalDonationFn,
+  getCustomerPurchaseFn,
+  getDonationPaymentStatusFn,
+} from "@/lib/purchase-server";
 
 export const Route = createFileRoute("/pago/resultado")({
   validateSearch: (search) =>
@@ -12,15 +16,30 @@ export const Route = createFileRoute("/pago/resultado")({
       .object({
         purchase: z.string().uuid().optional(),
         donation: z.string().uuid().optional(),
+        token: z
+          .string()
+          .regex(/^[A-Za-z0-9-]{1,64}$/)
+          .optional(),
+        paypal_cancelled: z.enum(["1"]).optional(),
       })
       .parse(search),
   loader: async ({ location }) => {
     const params = new URLSearchParams(location.searchStr);
     const donationId = params.get("donation");
     if (donationId) {
+      const paypalCancelled = params.get("paypal_cancelled") === "1";
+      const paypalOrderId = params.get("token");
+      const paypalCapture =
+        paypalOrderId && !paypalCancelled
+          ? await capturePayPalDonationFn({
+              data: { donationId, orderId: paypalOrderId },
+            })
+          : null;
       return {
         type: "donation" as const,
         result: await getDonationPaymentStatusFn({ data: { donationId } }),
+        paypalCapture,
+        paypalCancelled,
       };
     }
 
@@ -62,29 +81,55 @@ function PaymentResultPage() {
     const donation = result.result.donation;
     const paid = donation.payment_status === "approved";
     const failed = ["declined", "error", "voided"].includes(donation.payment_status);
+    const paypalCancelled = result.paypalCancelled && !paid;
+    const amount =
+      donation.amount_cents === null
+        ? null
+        : new Intl.NumberFormat("es-CO", {
+            style: "currency",
+            currency: donation.currency,
+            maximumFractionDigits: donation.currency === "COP" ? 0 : 2,
+          }).format(donation.amount_cents / 100);
     return (
       <CustomerAuthShell
-        title={paid ? "Donación confirmada" : "Estado de tu donación"}
-        description="La confirmación definitiva del pago se recibe de forma segura desde Wompi."
+        title={
+          paid
+            ? "Donación confirmada"
+            : paypalCancelled
+              ? "Checkout cancelado"
+              : "Estado de tu donación"
+        }
+        description={
+          donation.payment_method === "paypal"
+            ? "PayPal confirma el pago de forma segura antes de actualizar la donación."
+            : "La confirmación definitiva del pago se recibe de forma segura desde Wompi."
+        }
       >
         <div className="space-y-4">
           <Alert>
             <AlertTitle>
               {paid
                 ? "Donación confirmada"
-                : failed
-                  ? "El pago no fue aprobado"
-                  : "Pago pendiente de confirmación"}
+                : paypalCancelled
+                  ? "No se confirmó ningún pago"
+                  : failed
+                    ? "El pago no fue aprobado"
+                    : "Pago pendiente de confirmación"}
             </AlertTitle>
             <AlertDescription>
-              {new Intl.NumberFormat("es-CO", {
-                style: "currency",
-                currency: donation.currency,
-                maximumFractionDigits: 0,
-              }).format(donation.amount_cents / 100)}
-              . Actualiza esta página en un momento para consultar el estado más reciente.
+              {paypalCancelled
+                ? "El checkout de PayPal se canceló. Esta donación no se marcó como pagada."
+                : amount
+                  ? `${amount}. Actualiza esta página en un momento para consultar el estado más reciente.`
+                  : "El estado se actualizará cuando la pasarela confirme el pago."}
             </AlertDescription>
           </Alert>
+          {result.paypalCapture && !result.paypalCapture.ok ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              No fue posible confirmar la captura ahora. Si completaste el pago, espera un momento y
+              vuelve a consultar esta página.
+            </p>
+          ) : null}
           <p className="text-xs text-muted-foreground">Referencia: {donation.payment_reference}</p>
         </div>
         <Button asChild className="mt-5 w-full">

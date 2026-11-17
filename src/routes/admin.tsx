@@ -404,7 +404,7 @@ function formatPurchasePrice(amountCents: number, currency: string) {
   return new Intl.NumberFormat("es-CO", {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: currency === "COP" ? 0 : 2,
   }).format(amountCents / 100);
 }
 
@@ -493,8 +493,8 @@ function DonationList({
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        Verifica el abono en la cuenta antes de aprobar DaviPlata o PayPal. Wompi se actualiza
-        automáticamente con la notificación de la pasarela.
+        Verifica manualmente DaviPlata y donaciones antiguas de PayPal.me. Wompi y el nuevo PayPal
+        Checkout se actualizan automáticamente cuando la pasarela confirma el pago.
       </p>
       {reviewError ? (
         <Alert variant="destructive">
@@ -516,7 +516,9 @@ function DonationList({
         donations.map((donation) => {
           const canReview =
             donation.status === "pending" &&
-            (donation.payment_method === "daviplata" || donation.payment_method === "paypal");
+            (donation.payment_method === "daviplata" ||
+              (donation.payment_method === "paypal" &&
+                !donation.payment_reference.startsWith("paypal_checkout_")));
           const isReviewing = reviewingDonationId === donation.id;
           return (
             <Card key={donation.id} className="border-border/70">
@@ -544,7 +546,7 @@ function DonationList({
                 <div className="text-sm sm:text-right">
                   <p className="font-semibold text-foreground">
                     {donation.amount_cents === null
-                      ? "Monto elegido en PayPal"
+                      ? "Monto no disponible"
                       : formatPurchasePrice(donation.amount_cents, donation.currency)}
                   </p>
                   <p className="mt-1 capitalize text-muted-foreground">

@@ -10,7 +10,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { donation } from "@/content/site";
-import { registerOfflineDonationFn, startDonationCheckoutFn } from "@/lib/purchase-server";
+import {
+  registerOfflineDonationFn,
+  startDonationCheckoutFn,
+  startPayPalDonationCheckoutFn,
+} from "@/lib/purchase-server";
 
 type DonationMethodId = "wompi" | "daviplata" | "paypal";
 type ReportStatus = "idle" | "sending" | "success" | "error" | "config";
@@ -43,7 +47,7 @@ export function DonationOptions() {
       ? true
       : selectedMethod.id === "daviplata"
         ? Boolean(selectedMethod.receiver)
-        : Boolean(selectedMethod.link);
+        : true;
   const numericAmount = Number(amount);
   const minimumAmount = selectedMethod.currency === "COP" ? 1000 : 1;
   const maximumAmount = selectedMethod.currency === "COP" ? 100_000_000 : 100_000;
@@ -119,19 +123,22 @@ export function DonationOptions() {
         website: String(formData.get("website") ?? ""),
       };
 
-      const result =
-        selectedMethod.id === "daviplata"
-          ? await registerOfflineDonationFn({
-              data: { ...donor, metodo: "daviplata", monto: numericAmount },
-            })
-          : await registerOfflineDonationFn({
-              data: { ...donor, metodo: "paypal" },
-            });
-      if (result.ok) {
-        if (selectedMethod.id === "paypal" && selectedMethod.link) {
-          window.location.assign(selectedMethod.link);
+      if (selectedMethod.id === "paypal") {
+        const result = await startPayPalDonationCheckoutFn({
+          data: { ...donor, monto: numericAmount },
+        });
+        if (result.ok) {
+          window.location.assign(result.checkoutUrl);
           return;
         }
+        setStatus(result.error === "config" ? "config" : "error");
+        return;
+      }
+
+      const result = await registerOfflineDonationFn({
+        data: { ...donor, metodo: "daviplata", monto: numericAmount },
+      });
+      if (result.ok) {
         setStatus("success");
         setHasRegisteredDonor(true);
         return;
@@ -184,7 +191,7 @@ export function DonationOptions() {
             </p>
             {method.id === "paypal" ? (
               <p className="mt-2 text-xs text-muted-foreground">
-                Antes de continuar, te pediremos nombre, teléfono y correo electrónico.
+                En el formulario ingresarás el monto en USD y tus datos antes de abrir PayPal.
               </p>
             ) : null}
             {method.id === methodId && method.id !== "paypal" ? (
@@ -239,7 +246,7 @@ export function DonationOptions() {
                 ? "Donar con Wompi"
                 : method.id === "daviplata"
                   ? "Donar con DaviPlata"
-                  : "Registrar datos y donar con PayPal"}
+                  : "Donar con PayPal"}
             </Button>
           </div>
         ))}
@@ -250,12 +257,12 @@ export function DonationOptions() {
           <DialogHeader>
             <DialogTitle>
               {selectedMethod.id === "paypal"
-                ? "Datos del donante"
+                ? "Donación con PayPal"
                 : "Datos para continuar con tu donación"}
             </DialogTitle>
             <DialogDescription>
               {selectedMethod.id === "paypal"
-                ? "Completa este formulario antes de continuar. Elegirás el monto directamente en PayPal."
+                ? "Elige el monto aquí, registra tus datos y luego completa el pago seguro en PayPal."
                 : `${selectedMethod.name} · ${formatAmount(numericAmount, selectedMethod.currency)}. Ingresa tus datos para continuar.`}
             </DialogDescription>
           </DialogHeader>
@@ -272,7 +279,7 @@ export function DonationOptions() {
           {status === "config" || status === "error" ? (
             <Alert variant="destructive">
               <AlertTitle>
-                {selectedMethod.id === "wompi"
+                {selectedMethod.id !== "daviplata"
                   ? "No se pudo iniciar el pago"
                   : "No se pudieron guardar los datos"}
               </AlertTitle>
@@ -281,9 +288,13 @@ export function DonationOptions() {
                   ? status === "config"
                     ? "El checkout de Wompi aún no está configurado. Inténtalo más tarde o usa una transferencia manual."
                     : "No se pudo iniciar el checkout. Inténtalo de nuevo más tarde."
-                  : status === "config"
-                    ? "El registro de donantes no está configurado en el servidor."
-                    : "No se pudo guardar el registro. Inténtalo de nuevo más tarde."}
+                  : selectedMethod.id === "paypal"
+                    ? status === "config"
+                      ? "PayPal Checkout no está configurado correctamente en el servidor."
+                      : "No se pudo iniciar el checkout de PayPal. Inténtalo de nuevo más tarde."
+                    : status === "config"
+                      ? "El registro de donantes no está configurado en el servidor."
+                      : "No se pudo guardar el registro. Inténtalo de nuevo más tarde."}
               </AlertDescription>
             </Alert>
           ) : null}
@@ -298,6 +309,38 @@ export function DonationOptions() {
             }}
             className="grid gap-4 sm:grid-cols-2"
           >
+            {selectedMethod.id === "paypal" ? (
+              <div className="space-y-3 sm:col-span-2">
+                <p className="text-sm font-semibold text-foreground">Selecciona el monto (USD)</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedMethod.presets.map((preset) => (
+                    <Button
+                      key={preset}
+                      type="button"
+                      size="sm"
+                      variant={amount === String(preset) ? "default" : "outline"}
+                      onClick={() => updateAmount(String(preset))}
+                    >
+                      {formatAmount(preset, selectedMethod.currency)}
+                    </Button>
+                  ))}
+                </div>
+                <label className="block space-y-1.5 text-sm font-medium">
+                  Otro monto que deseas donar
+                  <input
+                    type="number"
+                    min={minimumAmount}
+                    max={maximumAmount}
+                    step={amountStep}
+                    required
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(event) => updateAmount(event.target.value)}
+                    className={fieldClass}
+                  />
+                </label>
+              </div>
+            ) : null}
             <label className="block space-y-1.5 text-sm font-medium">
               Nombre completo
               <input
@@ -353,7 +396,9 @@ export function DonationOptions() {
                 {status === "sending"
                   ? selectedMethod.id === "wompi"
                     ? "Preparando pago…"
-                    : "Guardando datos…"
+                    : selectedMethod.id === "paypal"
+                      ? "Preparando PayPal…"
+                      : "Guardando datos…"
                   : selectedMethod.id === "wompi"
                     ? "Pagar con Wompi"
                     : selectedMethod.id === "daviplata"

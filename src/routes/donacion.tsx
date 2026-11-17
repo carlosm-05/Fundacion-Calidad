@@ -59,8 +59,7 @@ function DonationPage() {
                 Elige cómo quieres donar
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                Puedes pagar en línea con Wompi, transferir manualmente a DaviPlata o enviar tu
-                aporte a PayPal desde otro país.
+                Puedes pagar en línea con Wompi o PayPal, o transferir manualmente a DaviPlata.
               </p>
             </Reveal>
 

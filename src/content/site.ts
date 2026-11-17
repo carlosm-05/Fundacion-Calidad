@@ -541,12 +541,10 @@ export const location = {
 /**
  * DONACIONES — Fundación Calidad
  * -------------------------------------------------
- * Reemplace cada `link` (o nº de cuenta) por la información real de la
- * Fundación. El botón "Donar" lleva a la página /donacion.
+ * La configuración de donaciones y las cuentas receptoras de la Fundación.
  */
 const daviplataReceiver = "0550108900905937";
 const daviplataHolder = "Fundación Calidad";
-const paypalDonationUrl = "https://paypal.me/fundacioncalidad";
 
 export const donation = {
   pagePath: "/donacion",
@@ -576,12 +574,11 @@ export const donation = {
     {
       id: "paypal",
       name: "PayPal",
-      subtitle: "Transferencia directa · Internacional",
+      subtitle: "Checkout seguro · Internacional",
       description:
-        "Envía tu aporte directamente a la cuenta PayPal de la Fundación. PayPal puede aplicar comisiones según la cuenta y el tipo de operación.",
+        "Elige el monto en USD y paga en el checkout seguro de PayPal. La confirmación se verificará automáticamente.",
       currency: "USD",
       presets: [5, 15, 30],
-      link: paypalDonationUrl,
     },
   ] as const,
 };

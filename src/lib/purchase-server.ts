@@ -235,6 +235,191 @@ export const startDonationCheckoutFn = createServerFn({ method: "POST" })
     return { ok: true, checkoutUrl: checkout.toString() };
   });
 
+const startPayPalDonationSchema = z.object({
+  nombre: z.string().trim().min(1).max(200),
+  correo: z.string().trim().email().max(320),
+  telefono: z
+    .string()
+    .trim()
+    .min(7)
+    .max(50)
+    .refine((value) => (value.match(/\d/g)?.length ?? 0) >= 7),
+  monto: z
+    .number()
+    .finite()
+    .min(1)
+    .max(100_000)
+    .refine((value) => Math.abs(value * 100 - Math.round(value * 100)) < 0.000001),
+  website: z.string().max(0).optional(),
+});
+
+const payPalOrderCreationSchema = z.object({
+  id: z.string().min(1),
+  links: z.array(z.object({ rel: z.string(), href: z.string().url() })),
+});
+
+function getPayPalAppUrl() {
+  const configuredUrl = env("APP_URL");
+  if (!configuredUrl) {
+    return env("NODE_ENV") === "production"
+      ? "https://www.fundacioncalidad.org"
+      : "http://localhost:8080";
+  }
+
+  try {
+    const url = new URL(configuredUrl);
+    if (
+      !["http:", "https:"].includes(url.protocol) ||
+      (env("NODE_ENV") === "production" && url.protocol !== "https:")
+    ) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+function getPayPalApprovalUrl(links: Array<{ rel: string; href: string }>, apiBaseUrl: string) {
+  const approvalLink = links.find((link) => link.rel === "approve" || link.rel === "payer-action");
+  if (!approvalLink) return null;
+
+  try {
+    const url = new URL(approvalLink.href);
+    const expectedHost = apiBaseUrl.includes("sandbox")
+      ? "www.sandbox.paypal.com"
+      : "www.paypal.com";
+    if (url.protocol !== "https:" || url.hostname !== expectedHost) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+async function markPayPalDonationCheckoutFailed(
+  supabase: NonNullable<ReturnType<typeof getSupabaseAdminClient>>,
+  donationId: string,
+) {
+  const { error } = await supabase
+    .from("donations")
+    .update({ status: "failed", payment_status: "error" })
+    .eq("id", donationId)
+    .eq("status", "pending");
+  if (error) {
+    console.error("[paypal] No se pudo marcar como fallido el inicio del checkout:", error);
+  }
+}
+
+export type StartPayPalDonationResult =
+  { ok: true; checkoutUrl: string } | { ok: false; error: "config" | "database" | "paypal" };
+
+export const startPayPalDonationCheckoutFn = createServerFn({ method: "POST" })
+  .validator((input: z.infer<typeof startPayPalDonationSchema>) =>
+    startPayPalDonationSchema.parse(input),
+  )
+  .handler(async ({ data }): Promise<StartPayPalDonationResult> => {
+    if (data.website) return { ok: false, error: "database" };
+
+    const supabase = getSupabaseAdminClient();
+    const payPal = getPayPalConfig();
+    const appUrl = getPayPalAppUrl();
+    if (!supabase || !payPal || !appUrl) return { ok: false, error: "config" };
+
+    const amountCents = Math.round(data.monto * 100);
+    const paymentReference = `paypal_checkout_${crypto.randomUUID().replaceAll("-", "")}`;
+    const { data: donation, error: insertError } = await supabase
+      .from("donations")
+      .insert({
+        donor_name: data.nombre,
+        donor_email: data.correo,
+        donor_phone: data.telefono,
+        amount_cents: amountCents,
+        currency: "USD",
+        payment_method: "paypal",
+        payment_reference: paymentReference,
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !donation) {
+      console.error("[paypal] No se pudo registrar la donación:", insertError);
+      return { ok: false, error: "database" };
+    }
+
+    const accessToken = await getPayPalAccessToken(payPal);
+    if (!accessToken) {
+      await markPayPalDonationCheckoutFailed(supabase, donation.id);
+      return { ok: false, error: "paypal" };
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(`${payPal.apiBaseUrl}/v2/checkout/orders`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          accept: "application/json",
+          "content-type": "application/json",
+          "paypal-request-id": crypto.randomUUID(),
+          prefer: "return=representation",
+        },
+        body: JSON.stringify({
+          intent: "CAPTURE",
+          purchase_units: [
+            {
+              custom_id: paymentReference,
+              invoice_id: paymentReference,
+              amount: {
+                currency_code: "USD",
+                value: (amountCents / 100).toFixed(2),
+              },
+              description: "Donación Fundación Calidad",
+            },
+          ],
+          application_context: {
+            brand_name: "Fundación Calidad",
+            user_action: "PAY_NOW",
+            shipping_preference: "NO_SHIPPING",
+            return_url: `${appUrl}/pago/resultado?donation=${donation.id}`,
+            cancel_url: `${appUrl}/pago/resultado?donation=${donation.id}&paypal_cancelled=1`,
+          },
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch {
+      console.error("[paypal] No se pudo crear la orden de checkout.");
+      await markPayPalDonationCheckoutFailed(supabase, donation.id);
+      return { ok: false, error: "paypal" };
+    }
+
+    if (!response.ok) {
+      console.error("[paypal] Falló la creación de la orden:", response.status);
+      await markPayPalDonationCheckoutFailed(supabase, donation.id);
+      return { ok: false, error: "paypal" };
+    }
+
+    let orderPayload: unknown;
+    try {
+      orderPayload = await response.json();
+    } catch {
+      console.error("[paypal] La respuesta de creación de orden no contenía JSON válido.");
+      await markPayPalDonationCheckoutFailed(supabase, donation.id);
+      return { ok: false, error: "paypal" };
+    }
+
+    const order = payPalOrderCreationSchema.safeParse(orderPayload);
+    const checkoutUrl = order.success
+      ? getPayPalApprovalUrl(order.data.links, payPal.apiBaseUrl)
+      : null;
+    if (!checkoutUrl) {
+      console.error("[paypal] La respuesta de creación no incluyó un enlace de aprobación válido.");
+      await markPayPalDonationCheckoutFailed(supabase, donation.id);
+      return { ok: false, error: "paypal" };
+    }
+
+    return { ok: true, checkoutUrl };
+  });
+
 const donorRegistrationBaseSchema = z.object({
   nombre: z.string().trim().min(1).max(200),
   correo: z.string().trim().email().max(320),
@@ -247,15 +432,10 @@ const donorRegistrationBaseSchema = z.object({
   website: z.string().max(0).optional(),
 });
 
-const registerDonationSchema = z.discriminatedUnion("metodo", [
-  donorRegistrationBaseSchema.extend({
-    metodo: z.literal("daviplata"),
-    monto: z.number().int().min(1000).max(100_000_000),
-  }),
-  donorRegistrationBaseSchema.extend({
-    metodo: z.literal("paypal"),
-  }),
-]);
+const registerDonationSchema = donorRegistrationBaseSchema.extend({
+  metodo: z.literal("daviplata"),
+  monto: z.number().int().min(1000).max(100_000_000),
+});
 
 export type RegisterDonationResult =
   | { ok: true; donationId: string; paymentReference: string }
@@ -269,10 +449,8 @@ export const registerOfflineDonationFn = createServerFn({ method: "POST" })
     const supabase = getSupabaseAdminClient();
     if (!supabase) return { ok: false, error: "config" };
 
-    const isDaviplata = data.metodo === "daviplata";
-    const paymentReference = `${isDaviplata ? "davi" : "paypal"}_${crypto.randomUUID().replaceAll("-", "")}`;
-    const amountCents = isDaviplata ? data.monto * 100 : null;
-    const currency = isDaviplata ? "COP" : "USD";
+    const paymentReference = `davi_${crypto.randomUUID().replaceAll("-", "")}`;
+    const amountCents = data.monto * 100;
     const { data: donation, error } = await supabase
       .from("donations")
       .insert({
@@ -280,7 +458,7 @@ export const registerOfflineDonationFn = createServerFn({ method: "POST" })
         donor_email: data.correo,
         donor_phone: data.telefono,
         amount_cents: amountCents,
-        currency,
+        currency: "COP",
         payment_method: data.metodo,
         payment_reference: paymentReference,
       })
@@ -327,7 +505,7 @@ export const reviewOfflineDonationFn = createServerFn({ method: "POST" })
 
     const { data: donation, error: loadError } = await supabase
       .from("donations")
-      .select("id,status,payment_method")
+      .select("id,status,payment_method,payment_reference")
       .eq("id", data.donationId)
       .maybeSingle();
     if (loadError) {
@@ -336,6 +514,12 @@ export const reviewOfflineDonationFn = createServerFn({ method: "POST" })
     }
     if (!donation) return { ok: false, error: "not_found" };
     if (donation.payment_method !== "daviplata" && donation.payment_method !== "paypal") {
+      return { ok: false, error: "unsupported_method" };
+    }
+    if (
+      donation.payment_method === "paypal" &&
+      donation.payment_reference.startsWith("paypal_checkout_")
+    ) {
       return { ok: false, error: "unsupported_method" };
     }
     if (donation.status !== "pending") return { ok: false, error: "not_pending" };
@@ -411,10 +595,11 @@ export const getCustomerPurchaseFn = createServerFn({ method: "GET" })
 
 export type DonationPaymentStatus = {
   id: string;
-  amount_cents: number;
+  amount_cents: number | null;
   currency: string;
   status: string;
   payment_status: string;
+  payment_method: "wompi" | "daviplata" | "paypal";
   payment_reference: string;
   created_at: string;
 };
@@ -429,7 +614,9 @@ export const getDonationPaymentStatusFn = createServerFn({ method: "GET" })
 
     const { data: donation, error } = await supabase
       .from("donations")
-      .select("id,amount_cents,currency,status,payment_status,payment_reference,created_at")
+      .select(
+        "id,amount_cents,currency,status,payment_status,payment_method,payment_reference,created_at",
+      )
       .eq("id", data.donationId)
       .maybeSingle();
     if (error) {
@@ -754,6 +941,265 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+const payPalOrderDetailsSchema = z.object({
+  id: z.string().min(1),
+  status: z.string().min(1),
+  purchase_units: z
+    .array(
+      z.object({
+        custom_id: z.string().optional(),
+        invoice_id: z.string().optional(),
+        amount: z.object({ currency_code: z.string(), value: z.string() }),
+        payments: z
+          .object({
+            captures: z
+              .array(
+                z.object({
+                  id: z.string().min(1),
+                  status: z.string().min(1),
+                  amount: z.object({ currency_code: z.string(), value: z.string() }),
+                }),
+              )
+              .optional(),
+          })
+          .optional(),
+      }),
+    )
+    .min(1),
+});
+
+const capturePayPalDonationSchema = z.object({
+  donationId: z.string().uuid(),
+  orderId: z.string().regex(/^[A-Za-z0-9-]{1,64}$/),
+});
+
+export type CapturePayPalDonationResult =
+  | { ok: true; status: "paid" | "pending" }
+  | {
+      ok: false;
+      error: "config" | "database" | "paypal" | "not_found" | "mismatch" | "not_pending";
+    };
+
+function parseUsdAmountCents(value: string, currency: string) {
+  const amount = Number(value);
+  if (
+    currency !== "USD" ||
+    !Number.isFinite(amount) ||
+    amount <= 0 ||
+    !Number.isSafeInteger(Math.round(amount * 100)) ||
+    Math.abs(amount * 100 - Math.round(amount * 100)) >= 0.000001
+  ) {
+    return null;
+  }
+  return Math.round(amount * 100);
+}
+
+export const capturePayPalDonationFn = createServerFn({ method: "POST" })
+  .validator((input: z.infer<typeof capturePayPalDonationSchema>) =>
+    capturePayPalDonationSchema.parse(input),
+  )
+  .handler(async ({ data }): Promise<CapturePayPalDonationResult> => {
+    const supabase = getSupabaseAdminClient();
+    const payPal = getPayPalConfig();
+    if (!supabase || !payPal) return { ok: false, error: "config" };
+
+    const accessToken = await getPayPalAccessToken(payPal);
+    if (!accessToken) return { ok: false, error: "paypal" };
+
+    let orderResponse: Response;
+    try {
+      orderResponse = await fetch(
+        `${payPal.apiBaseUrl}/v2/checkout/orders/${encodeURIComponent(data.orderId)}`,
+        {
+          headers: {
+            authorization: `Bearer ${accessToken}`,
+            accept: "application/json",
+          },
+          signal: AbortSignal.timeout(10_000),
+        },
+      );
+    } catch {
+      console.error("[paypal] No se pudo consultar la orden de checkout.");
+      return { ok: false, error: "paypal" };
+    }
+
+    if (!orderResponse.ok) {
+      console.error("[paypal] Falló la consulta de la orden:", orderResponse.status);
+      return { ok: false, error: "paypal" };
+    }
+
+    let orderPayload: unknown;
+    try {
+      orderPayload = await orderResponse.json();
+    } catch {
+      console.error("[paypal] La respuesta de consulta de orden no contenía JSON válido.");
+      return { ok: false, error: "paypal" };
+    }
+
+    const parsedOrder = payPalOrderDetailsSchema.safeParse(orderPayload);
+    if (!parsedOrder.success || parsedOrder.data.id !== data.orderId) {
+      return { ok: false, error: "mismatch" };
+    }
+
+    let order = parsedOrder.data;
+    if (order.purchase_units.length !== 1) return { ok: false, error: "mismatch" };
+    let purchaseUnit = order.purchase_units[0];
+    if (!purchaseUnit) return { ok: false, error: "mismatch" };
+
+    const customId = purchaseUnit.custom_id;
+    const invoiceId = purchaseUnit.invoice_id;
+    if (!customId && !invoiceId) return { ok: false, error: "mismatch" };
+    if (customId && invoiceId && customId !== invoiceId) return { ok: false, error: "mismatch" };
+    const paymentReference = customId || invoiceId;
+    if (!paymentReference) return { ok: false, error: "mismatch" };
+
+    const orderAmountCents = parseUsdAmountCents(
+      purchaseUnit.amount.value,
+      purchaseUnit.amount.currency_code,
+    );
+    if (orderAmountCents === null) return { ok: false, error: "mismatch" };
+
+    const { data: donation, error: loadError } = await supabase
+      .from("donations")
+      .select("id,status,payment_method,currency,amount_cents,payment_transaction_id")
+      .eq("payment_reference", paymentReference)
+      .maybeSingle();
+    if (loadError) {
+      console.error("[paypal] No se pudo cargar la donación de la orden:", loadError);
+      return { ok: false, error: "database" };
+    }
+    if (!donation) return { ok: false, error: "not_found" };
+    if (
+      donation.id !== data.donationId ||
+      donation.payment_method !== "paypal" ||
+      donation.currency !== "USD" ||
+      Number(donation.amount_cents) !== orderAmountCents
+    ) {
+      return { ok: false, error: "mismatch" };
+    }
+    if (donation.status !== "pending" && order.status !== "COMPLETED") {
+      return { ok: false, error: "not_pending" };
+    }
+
+    if (order.status === "APPROVED") {
+      let captureResponse: Response;
+      try {
+        captureResponse = await fetch(
+          `${payPal.apiBaseUrl}/v2/checkout/orders/${encodeURIComponent(data.orderId)}/capture`,
+          {
+            method: "POST",
+            headers: {
+              authorization: `Bearer ${accessToken}`,
+              accept: "application/json",
+              "content-type": "application/json",
+              "paypal-request-id": (await sha256(`capture:${data.orderId}`)).slice(0, 32),
+            },
+            body: JSON.stringify({}),
+            signal: AbortSignal.timeout(10_000),
+          },
+        );
+      } catch {
+        console.error("[paypal] No se pudo capturar la orden aprobada.");
+        return { ok: false, error: "paypal" };
+      }
+
+      if (!captureResponse.ok) {
+        console.error("[paypal] Falló la captura de la orden:", captureResponse.status);
+        return { ok: false, error: "paypal" };
+      }
+
+      let capturePayload: unknown;
+      try {
+        capturePayload = await captureResponse.json();
+      } catch {
+        console.error("[paypal] La respuesta de captura no contenía JSON válido.");
+        return { ok: false, error: "paypal" };
+      }
+      const parsedCapture = payPalOrderDetailsSchema.safeParse(capturePayload);
+      if (!parsedCapture.success || parsedCapture.data.id !== data.orderId) {
+        return { ok: false, error: "mismatch" };
+      }
+      order = parsedCapture.data;
+      if (order.purchase_units.length !== 1) return { ok: false, error: "mismatch" };
+      purchaseUnit = order.purchase_units[0];
+      if (!purchaseUnit) return { ok: false, error: "mismatch" };
+    }
+
+    if (order.status !== "COMPLETED") return { ok: true, status: "pending" };
+
+    const finalCustomId = purchaseUnit.custom_id;
+    const finalInvoiceId = purchaseUnit.invoice_id;
+    if (
+      (finalCustomId && finalCustomId !== paymentReference) ||
+      (finalInvoiceId && finalInvoiceId !== paymentReference) ||
+      (finalCustomId && finalInvoiceId && finalCustomId !== finalInvoiceId)
+    ) {
+      return { ok: false, error: "mismatch" };
+    }
+
+    const captures = purchaseUnit.payments?.captures ?? [];
+    if (captures.length !== 1) return { ok: false, error: "mismatch" };
+    const capture = captures[0];
+    if (!capture || capture.status !== "COMPLETED") return { ok: true, status: "pending" };
+    const capturedAmountCents = parseUsdAmountCents(
+      capture.amount.value,
+      capture.amount.currency_code,
+    );
+    if (
+      capturedAmountCents === null ||
+      capturedAmountCents !== orderAmountCents ||
+      capturedAmountCents !== Number(donation.amount_cents)
+    ) {
+      return { ok: false, error: "mismatch" };
+    }
+
+    if (donation.status === "paid" && donation.payment_transaction_id === capture.id) {
+      return { ok: true, status: "paid" };
+    }
+    if (donation.status !== "pending" || donation.payment_transaction_id) {
+      return { ok: false, error: "not_pending" };
+    }
+
+    const { data: updatedDonation, error: updateError } = await supabase
+      .from("donations")
+      .update({
+        amount_cents: capturedAmountCents,
+        status: "paid",
+        payment_status: "approved",
+        payment_transaction_id: capture.id,
+      })
+      .eq("id", donation.id)
+      .eq("status", "pending")
+      .eq("payment_method", "paypal")
+      .eq("currency", "USD")
+      .eq("amount_cents", capturedAmountCents)
+      .is("payment_transaction_id", null)
+      .select("id")
+      .maybeSingle();
+    if (updateError) {
+      console.error("[paypal] No se pudo confirmar la donación capturada:", updateError);
+      return { ok: false, error: "database" };
+    }
+    if (updatedDonation) return { ok: true, status: "paid" };
+
+    const { data: currentDonation, error: currentError } = await supabase
+      .from("donations")
+      .select("status,payment_transaction_id")
+      .eq("id", donation.id)
+      .maybeSingle();
+    if (currentError) {
+      console.error("[paypal] No se pudo comprobar el estado de la donación:", currentError);
+      return { ok: false, error: "database" };
+    }
+    if (
+      currentDonation?.status === "paid" &&
+      currentDonation.payment_transaction_id === capture.id
+    ) {
+      return { ok: true, status: "paid" };
+    }
+    return { ok: false, error: "not_pending" };
+  });
+
 export async function processPayPalEvent(headers: Headers, payload: unknown) {
   const config = getPayPalConfig();
   if (!config) return { ok: false as const, status: 503 };
@@ -884,7 +1330,7 @@ export async function processPayPalEvent(headers: Headers, payload: unknown) {
     console.warn("[paypal] La donación vinculada ya no está pendiente.");
     return { ok: true as const };
   }
-  if (donation.amount_cents !== null && Number(donation.amount_cents) !== amountCents) {
+  if (donation.amount_cents === null || Number(donation.amount_cents) !== amountCents) {
     console.warn("[paypal] El importe del pago no coincide con el registro.");
     return { ok: true as const };
   }
