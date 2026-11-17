@@ -8,7 +8,6 @@ import { z } from "zod";
  * al navegador. Requiere en el entorno:
  *
  *   BREVO_API_KEY       clave de API de Brevo (Settings > SMTP & API)
- *   BREVO_SENDER_EMAIL  remitente verificado en Brevo (Settings > Senders)
  *
  * En local van en el archivo `.env` (ignorado por git); en producción
  * se configuran como variables de entorno (Vercel > Settings > Env Vars).
@@ -194,7 +193,6 @@ async function sendFoundationEmail({
   replyTo,
 }: FoundationEmail): Promise<DonationReportResult> {
   const apiKey = env("BREVO_API_KEY");
-  const senderEmail = env("BREVO_SENDER_EMAIL") ?? CORREO_FUNDACION;
 
   if (!apiKey) {
     console.error("[correo] Falta BREVO_API_KEY en el entorno del servidor.");
@@ -211,7 +209,7 @@ async function sendFoundationEmail({
         "api-key": apiKey,
       },
       body: JSON.stringify({
-        sender: { name: "Sitio Web Fundación Calidad", email: senderEmail },
+        sender: { name: "Fundación Calidad", email: CORREO_FUNDACION },
         to: [{ email: CORREO_FUNDACION, name: "Fundación Calidad" }],
         ...(replyTo ? { replyTo } : {}),
         subject,

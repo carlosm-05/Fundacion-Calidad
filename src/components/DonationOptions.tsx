@@ -71,7 +71,7 @@ export function DonationOptions() {
 
   async function submitReport(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (status === "sending" || !isReady) return;
+    if (selectedMethod.id === "paypal" || status === "sending" || !isReady) return;
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -157,7 +157,7 @@ export function DonationOptions() {
             <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
               {method.description}
             </p>
-            {method.id === methodId ? (
+            {method.id === methodId && method.id !== "paypal" ? (
               <div className="mt-5 border-t border-border pt-4">
                 <p className="text-sm font-semibold text-foreground">
                   Selecciona o escribe el monto
@@ -196,9 +196,7 @@ export function DonationOptions() {
                       ? method.receiver
                         ? "La cuenta receptora se mostrará después de avisar a la Fundación."
                         : "El número de DaviPlata se habilitará cuando el propietario lo confirme."
-                      : method.link
-                        ? "Puedes donar directamente en PayPal; el aviso a la Fundación es opcional. Si el monto no aparece precargado, ingrésalo en PayPal."
-                        : "El enlace oficial de PayPal se habilitará cuando el propietario lo comparta."}
+                      : null}
                 </p>
               </div>
             ) : null}
@@ -206,21 +204,14 @@ export function DonationOptions() {
         ))}
       </div>
 
-      <div className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-        <h3 className="font-display text-xl font-semibold text-foreground">
-          {selectedMethod.id === "paypal"
-            ? "Aviso opcional a la Fundación"
-            : "Datos para continuar con tu donación"}
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {selectedMethod.id === "wompi"
-            ? "Ingresa tus datos y el monto para continuar al checkout seguro de Wompi. La confirmación del pago se recibirá desde la pasarela."
-            : selectedMethod.id === "paypal"
-              ? "Puedes donar directamente con el botón de PayPal. Este formulario es opcional y solo envía un aviso; no confirma el pago."
-              : "Al enviar el formulario, avisaremos a la Fundación el monto elegido y el método. Es un aviso de intención, no una confirmación de pago; la recepción se verifica manualmente."}
-        </p>
-
-        {selectedMethod.id === "paypal" && selectedMethod.link ? (
+      {selectedMethod.id === "paypal" && selectedMethod.link ? (
+        <div className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+          <h3 className="font-display text-xl font-semibold text-foreground">
+            Donar directamente con PayPal
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Elige el monto que deseas aportar directamente en PayPal.
+          </p>
           <a
             href={selectedMethod.link}
             target="_blank"
@@ -230,7 +221,20 @@ export function DonationOptions() {
             Donar con PayPal
             <ExternalLink className="h-4 w-4" />
           </a>
-        ) : null}
+        </div>
+      ) : null}
+      <div
+        hidden={selectedMethod.id === "paypal"}
+        className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
+      >
+        <h3 className="font-display text-xl font-semibold text-foreground">
+          Datos para continuar con tu donación
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {selectedMethod.id === "wompi"
+            ? "Ingresa tus datos y el monto para continuar al checkout seguro de Wompi. La confirmación del pago se recibirá desde la pasarela."
+            : "Al enviar el formulario, avisaremos a la Fundación el monto elegido y el método. Es un aviso de intención, no una confirmación de pago; la recepción se verifica manualmente."}
+        </p>
 
         {status === "success" ? (
           <Alert className="mt-5">
