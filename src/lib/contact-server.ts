@@ -16,8 +16,7 @@ import { z } from "zod";
 
 const BREVO_SMTP_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
 
-/** PROVISIONAL: correo de la Fundación (mismo valor que en content/site.ts). */
-const CORREO_FUNDACION = "fundacioncalidad.org2026@gmail.com";
+const CORREO_FUNDACION = "presidencia@fundacioncalidad.org";
 
 const contactSchema = z.object({
   nombre: z.string().trim().min(1).max(200),

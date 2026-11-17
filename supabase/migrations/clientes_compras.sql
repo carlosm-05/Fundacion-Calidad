@@ -54,7 +54,7 @@ on conflict (id) do update
 
 update public.profiles
 set role = 'admin'
-where email = lower('fundacioncalidad.org2026@gmail.com');
+where email = lower('presidencia@fundacioncalidad.org');
 
 create or replace function public.is_admin()
 returns boolean

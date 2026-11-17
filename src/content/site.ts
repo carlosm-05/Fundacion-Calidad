@@ -460,16 +460,16 @@ export const services: Service[] = [
   },
 ];
 
-/** PROVISIONAL: reemplazar por los datos oficiales de la Fundación. */
+/** Datos de contacto oficiales de la Fundación. */
 export const contact = {
-  email: "fundacioncalidad.org2026@gmail.com",
+  email: "presidencia@fundacioncalidad.org",
   phone: "+57 322 359 8898",
   address: "Km 4 #3, Finca Bonaire, Villavicencio, Meta",
   /**
    * Gmail — abre Gmail con un correo nuevo dirigido a la Fundación.
    */
   gmail: {
-    href: "https://mail.google.com/mail/?view=cm&fs=1&to=fundacioncalidad.org2026@gmail.com",
+    href: "https://mail.google.com/mail/?view=cm&fs=1&to=presidencia@fundacioncalidad.org",
     label: "Gmail",
   },
   /**
