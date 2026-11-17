@@ -545,7 +545,7 @@ export const location = {
  * Fundación. El botón "Donar" lleva a la página /donacion.
  */
 const daviplataReceiver = "0550108900905937";
-const daviplataHolder = import.meta.env["VITE_DAVIPLATA_HOLDER"]?.trim() ?? "";
+const daviplataHolder = "Fundación Calidad";
 const paypalDonationUrl = "https://paypal.me/fundacioncalidad";
 
 export const donation = {
@@ -567,7 +567,7 @@ export const donation = {
       name: "DaviPlata",
       subtitle: "Transferencia directa · Colombia",
       description:
-        "Elige un monto y transfiérelo directamente a la cuenta DaviPlata de la Fundación. Después podrás reportar tu donación para que podamos verificarla.",
+        "Cuenta DaviPlata activa para recibir donaciones. Ingresa tus datos y el monto; el número de cuenta aparecerá antes de transferir.",
       currency: "COP",
       presets: [10000, 30000, 50000],
       receiver: daviplataReceiver,

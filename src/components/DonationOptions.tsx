@@ -65,7 +65,12 @@ export function DonationOptions() {
   }
 
   function openDonationDialog(nextMethodId: DonationMethodId) {
-    if (nextMethodId !== methodId) chooseMethod(nextMethodId);
+    const nextMethod = donation.methods.find((method) => method.id === nextMethodId);
+    if (!nextMethod) return;
+    setMethodId(nextMethodId);
+    setAmount(String(nextMethod.presets[0]));
+    setHasRegisteredDonor(false);
+    setStatus("idle");
     setDialogOpen(true);
   }
 
@@ -173,10 +178,15 @@ export function DonationOptions() {
                 {method.currency}
               </span>
             </label>
-            <p className="mt-4 text-sm font-medium text-muted-foreground">{method.subtitle}</p>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-sm font-medium text-muted-foreground">{method.subtitle}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               {method.description}
             </p>
+            {method.id === "paypal" ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Antes de continuar, te pediremos nombre, teléfono y correo electrónico.
+              </p>
+            ) : null}
             {method.id === methodId && method.id !== "paypal" ? (
               <div className="mt-5 border-t border-border pt-4">
                 <p className="text-sm font-semibold text-foreground">
@@ -214,22 +224,22 @@ export function DonationOptions() {
                     ? "Continuarás al checkout de Wompi. El estado se confirmará mediante una notificación segura de la pasarela."
                     : method.id === "daviplata"
                       ? method.receiver
-                        ? "La cuenta receptora se mostrará después de avisar a la Fundación."
-                        : "El número de DaviPlata se habilitará cuando el propietario lo confirme."
+                        ? "La cuenta receptora se mostrará después de guardar tus datos."
+                        : "No es posible abrir este método en este momento. Inténtalo más tarde."
                       : null}
                 </p>
               </div>
             ) : null}
             <Button
               type="button"
-              className="mt-5 w-full"
+              className="mt-4 w-full"
               onClick={() => openDonationDialog(method.id)}
             >
               {method.id === "wompi"
                 ? "Donar con Wompi"
                 : method.id === "daviplata"
                   ? "Donar con DaviPlata"
-                  : "Donar con PayPal"}
+                  : "Registrar datos y donar con PayPal"}
             </Button>
           </div>
         ))}
@@ -238,10 +248,14 @@ export function DonationOptions() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Datos para continuar con tu donación</DialogTitle>
+            <DialogTitle>
+              {selectedMethod.id === "paypal"
+                ? "Datos del donante"
+                : "Datos para continuar con tu donación"}
+            </DialogTitle>
             <DialogDescription>
               {selectedMethod.id === "paypal"
-                ? "Completa tus datos. El monto lo elegirás directamente en PayPal."
+                ? "Completa este formulario antes de continuar. Elegirás el monto directamente en PayPal."
                 : `${selectedMethod.name} · ${formatAmount(numericAmount, selectedMethod.currency)}. Ingresa tus datos para continuar.`}
             </DialogDescription>
           </DialogHeader>
@@ -348,7 +362,7 @@ export function DonationOptions() {
               </Button>
               {!isReady ? (
                 <p className="mt-2 text-center text-xs text-muted-foreground">
-                  La cuenta DaviPlata aún no está configurada.
+                  No es posible continuar con este método en este momento.
                 </p>
               ) : null}
             </div>
