@@ -546,21 +546,7 @@ export const location = {
  */
 const daviplataReceiver = import.meta.env["VITE_DAVIPLATA_RECEIVER"]?.trim() ?? "";
 const daviplataHolder = import.meta.env["VITE_DAVIPLATA_HOLDER"]?.trim() ?? "";
-const paypalDonationUrl = (() => {
-  const rawUrl = import.meta.env["VITE_PAYPAL_DONATION_URL"]?.trim();
-  if (!rawUrl) return "";
-  try {
-    const url = new URL(rawUrl);
-    const isPayPalHost =
-      url.hostname === "paypal.me" ||
-      url.hostname === "paypal.com" ||
-      url.hostname === "www.paypal.com" ||
-      url.hostname.endsWith(".paypal.com");
-    return url.protocol === "https:" && isPayPalHost ? url.toString() : "";
-  } catch {
-    return "";
-  }
-})();
+const paypalDonationUrl = "https://paypal.me/fundacioncalidad";
 
 export const donation = {
   pagePath: "/donacion",
