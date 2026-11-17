@@ -159,6 +159,14 @@ async function removeCatalogTechnicalSheets(
   if (error) console.error("[catalogo] No se pudieron eliminar algunas fichas técnicas:", error);
 }
 
+function isMissingTechnicalSheetColumn(error: { code?: string; message?: string } | null) {
+  return Boolean(
+    error &&
+    ["42703", "PGRST204"].includes(error.code ?? "") &&
+    error.message?.toLowerCase().includes("technical_sheet_url"),
+  );
+}
+
 export const getPublishedCatalogFn = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicCatalogResult> => {
     const client = createPublicClient();
@@ -181,11 +189,36 @@ export const getPublishedCatalogFn = createServerFn({ method: "GET" }).handler(
         .order("created_at", { ascending: true }),
     ]);
 
-    if (productsResult.error || servicesResult.error) {
+    if (servicesResult.error) {
       console.error(
         "[catalogo] No se pudieron cargar los catálogos públicos:",
-        productsResult.error ?? servicesResult.error,
+        servicesResult.error,
       );
+      return { ok: false, error: "load" };
+    }
+
+    if (productsResult.error) {
+      if (isMissingTechnicalSheetColumn(productsResult.error)) {
+        const { data: legacyProducts, error: legacyError } = await client
+          .from("products")
+          .select("id,name,model,description,price,gallery,is_active,created_at,updated_at")
+          .eq("is_active", true)
+          .order("created_at", { ascending: true });
+        if (legacyError) {
+          console.error("[catalogo] No se pudo cargar el catálogo de productos:", legacyError);
+          return { ok: false, error: "load" };
+        }
+        console.warn(
+          "[catalogo] Falta aplicar la migración de fichas técnicas; se muestra el catálogo sin fichas.",
+        );
+        return {
+          ok: true,
+          products: legacyProducts.map((product) => ({ ...product, technical_sheet_url: null })),
+          services: servicesResult.data,
+        };
+      }
+
+      console.error("[catalogo] No se pudo cargar el catálogo de productos:", productsResult.error);
       return { ok: false, error: "load" };
     }
 
@@ -217,11 +250,35 @@ export const getAdminCatalogFn = createServerFn({ method: "GET" }).handler(
         .order("created_at", { ascending: true }),
     ]);
 
-    if (productsResult.error || servicesResult.error) {
+    if (servicesResult.error) {
       console.error(
         "[catalogo] No se pudieron cargar los catálogos de administración:",
-        productsResult.error ?? servicesResult.error,
+        servicesResult.error,
       );
+      return { ok: false, error: "load" };
+    }
+
+    if (productsResult.error) {
+      if (isMissingTechnicalSheetColumn(productsResult.error)) {
+        const { data: legacyProducts, error: legacyError } = await admin.client
+          .from("products")
+          .select("id,name,model,description,price,gallery,is_active,created_at,updated_at")
+          .order("created_at", { ascending: true });
+        if (legacyError) {
+          console.error("[catalogo] No se pudo cargar el catálogo de productos:", legacyError);
+          return { ok: false, error: "load" };
+        }
+        console.warn(
+          "[catalogo] Falta aplicar la migración de fichas técnicas; se muestra el catálogo sin fichas.",
+        );
+        return {
+          ok: true,
+          products: legacyProducts.map((product) => ({ ...product, technical_sheet_url: null })),
+          services: servicesResult.data,
+        };
+      }
+
+      console.error("[catalogo] No se pudo cargar el catálogo de productos:", productsResult.error);
       return { ok: false, error: "load" };
     }
 
