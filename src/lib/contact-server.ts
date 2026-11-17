@@ -97,7 +97,7 @@ function escapeHtml(value: string): string {
 }
 
 function buildContent(data: z.infer<typeof contactSchema>) {
-  const subject = `Nuevo mensaje de contacto — ${data.nombre}`;
+  const subject = `Nuevo registro del formulario de contacto — ${data.nombre}`;
   const rows: [string, string][] = [
     ["Nombre", data.nombre],
     ["Correo electrónico", data.correo],
@@ -105,13 +105,17 @@ function buildContent(data: z.infer<typeof contactSchema>) {
     ["Mensaje", data.mensaje],
   ];
   const textContent = [
-    `Asunto: ${subject}`,
+    "NUEVO REGISTRO DEL FORMULARIO DE CONTACTO",
+    "Se recibió un registro desde el sitio web de Fundación Calidad.",
     "",
     ...rows.map(([label, value]) => `${label}: ${value}`),
   ].join("\n");
   const htmlContent = `
     <div style="font-family:Arial,Helvetica,sans-serif;color:#1f2937;line-height:1.6">
-      <h2 style="margin-bottom:16px">Nuevo mensaje desde el sitio web</h2>
+      <h2 style="margin-bottom:8px">Nuevo registro del formulario de contacto</h2>
+      <p style="margin-top:0;margin-bottom:16px;color:#4b5563">
+        Se recibió un registro desde el sitio web de Fundación Calidad.
+      </p>
       <table style="border-collapse:collapse;width:100%;max-width:560px">
         ${rows
           .map(
@@ -126,7 +130,7 @@ function buildContent(data: z.infer<typeof contactSchema>) {
           .join("")}
       </table>
       <p style="margin-top:16px;font-size:12px;color:#6b7280">
-        Enviado desde el formulario de contacto de la Fundación Calidad.
+        Notificación automática del formulario de contacto de Fundación Calidad.
       </p>
     </div>`.trim();
   return { subject, textContent, htmlContent };

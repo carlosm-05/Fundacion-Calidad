@@ -2,6 +2,13 @@ import { useState, type FormEvent } from "react";
 import { CheckCircle2, Copy, ExternalLink, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { donation } from "@/content/site";
 import { sendDonationReportFn } from "@/lib/contact-server";
 import { startDonationCheckoutFn } from "@/lib/purchase-server";
@@ -27,6 +34,7 @@ export function DonationOptions() {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const [hasReportedIntent, setHasReportedIntent] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const selectedMethod =
     donation.methods.find((method) => method.id === methodId) ?? donation.methods[0];
@@ -55,6 +63,11 @@ export function DonationOptions() {
     updateAmount(String(nextMethod.presets[0]));
     setHasReportedIntent(false);
     setStatus("idle");
+  }
+
+  function openDonationDialog(nextMethodId: "wompi" | "daviplata") {
+    if (nextMethodId !== methodId) chooseMethod(nextMethodId);
+    setDialogOpen(true);
   }
 
   async function copyDaviplataNumber() {
@@ -200,183 +213,180 @@ export function DonationOptions() {
                 </p>
               </div>
             ) : null}
+            {method.id === "paypal" ? (
+              method.link ? (
+                <a
+                  href={method.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
+                >
+                  Donar con PayPal
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              ) : null
+            ) : (
+              <Button
+                type="button"
+                className="mt-5 w-full"
+                onClick={() => openDonationDialog(method.id)}
+              >
+                {method.id === "wompi" ? "Pagar con Wompi" : "Donar con DaviPlata"}
+              </Button>
+            )}
           </div>
         ))}
       </div>
 
-      {selectedMethod.id === "paypal" && selectedMethod.link ? (
-        <div className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-          <h3 className="font-display text-xl font-semibold text-foreground">
-            Donar directamente con PayPal
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Elige el monto que deseas aportar directamente en PayPal.
-          </p>
-          <a
-            href={selectedMethod.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-secondary"
-          >
-            Donar con PayPal
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        </div>
-      ) : null}
-      <div
-        hidden={selectedMethod.id === "paypal"}
-        className="mx-auto mt-8 max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8"
-      >
-        <h3 className="font-display text-xl font-semibold text-foreground">
-          Datos para continuar con tu donación
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {selectedMethod.id === "wompi"
-            ? "Ingresa tus datos y el monto para continuar al checkout seguro de Wompi. La confirmación del pago se recibirá desde la pasarela."
-            : "Al enviar el formulario, avisaremos a la Fundación el monto elegido y el método. Es un aviso de intención, no una confirmación de pago; la recepción se verifica manualmente."}
-        </p>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Datos para continuar con tu donación</DialogTitle>
+            <DialogDescription>
+              {selectedMethod.name} · {formatAmount(numericAmount, selectedMethod.currency)}.
+              Ingresa tus datos para continuar.
+            </DialogDescription>
+          </DialogHeader>
 
-        {status === "success" ? (
-          <Alert className="mt-5">
-            <CheckCircle2 className="h-4 w-4" />
-            <AlertTitle>Aviso enviado a la Fundación</AlertTitle>
-            <AlertDescription>
-              Ya notificamos que deseas donar {formatAmount(numericAmount, selectedMethod.currency)}{" "}
-              por {selectedMethod.name}. Este aviso no confirma que el dinero haya sido enviado o
-              recibido.
-            </AlertDescription>
-          </Alert>
-        ) : null}
-        {status === "config" || status === "error" ? (
-          <Alert variant="destructive" className="mt-5">
-            <AlertTitle>
-              {selectedMethod.id === "wompi"
-                ? "No se pudo iniciar el pago"
-                : "No se pudo enviar el reporte"}
-            </AlertTitle>
-            <AlertDescription>
-              {selectedMethod.id === "wompi"
-                ? status === "config"
-                  ? "El checkout de Wompi aún no está configurado. Inténtalo más tarde o usa una transferencia manual."
-                  : "No se pudo iniciar el checkout. Inténtalo de nuevo más tarde."
-                : status === "config"
-                  ? "El correo de notificación aún no está configurado."
-                  : "Inténtalo de nuevo más tarde o contáctanos directamente."}
-            </AlertDescription>
-          </Alert>
-        ) : null}
+          {status === "success" ? (
+            <Alert>
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertTitle>Aviso enviado a la Fundación</AlertTitle>
+              <AlertDescription>
+                El aviso no confirma que el dinero haya sido enviado o recibido.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {status === "config" || status === "error" ? (
+            <Alert variant="destructive">
+              <AlertTitle>
+                {selectedMethod.id === "wompi"
+                  ? "No se pudo iniciar el pago"
+                  : "No se pudo enviar el reporte"}
+              </AlertTitle>
+              <AlertDescription>
+                {selectedMethod.id === "wompi"
+                  ? status === "config"
+                    ? "El checkout de Wompi aún no está configurado. Inténtalo más tarde o usa una transferencia manual."
+                    : "No se pudo iniciar el checkout. Inténtalo de nuevo más tarde."
+                  : status === "config"
+                    ? "El correo de notificación aún no está configurado."
+                    : "Inténtalo de nuevo más tarde o contáctanos directamente."}
+              </AlertDescription>
+            </Alert>
+          ) : null}
 
-        <form
-          onSubmit={submitReport}
-          onChange={() => {
-            if (hasReportedIntent) {
-              setHasReportedIntent(false);
-              setStatus("idle");
-            }
-          }}
-          className="mt-5 grid gap-4 sm:grid-cols-2"
-        >
-          <label className="block space-y-1.5 text-sm font-medium">
-            Nombre completo
-            <input
-              name="nombre"
-              type="text"
-              required
-              maxLength={200}
-              autoComplete="name"
-              className={fieldClass}
-            />
-          </label>
-          <label className="block space-y-1.5 text-sm font-medium">
-            Teléfono
-            <input
-              name="telefono"
-              type="tel"
-              required
-              minLength={7}
-              maxLength={50}
-              autoComplete="tel"
-              className={fieldClass}
-            />
-          </label>
-          <label className="block space-y-1.5 text-sm font-medium sm:col-span-2">
-            Correo electrónico
-            <input
-              name="correo"
-              type="email"
-              required
-              maxLength={320}
-              autoComplete="email"
-              className={fieldClass}
-            />
-          </label>
-          <div aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">
-            <label>
-              No llenar
-              <input name="website" tabIndex={-1} autoComplete="off" />
-            </label>
-          </div>
-          <div className="sm:col-span-2">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={
-                status === "sending" ||
-                !isReady ||
-                !Number.isFinite(numericAmount) ||
-                hasReportedIntent
+          <form
+            onSubmit={submitReport}
+            onChange={() => {
+              if (hasReportedIntent) {
+                setHasReportedIntent(false);
+                setStatus("idle");
               }
-            >
-              {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {status === "sending"
-                ? selectedMethod.id === "wompi"
-                  ? "Preparando pago…"
-                  : "Enviando aviso…"
-                : selectedMethod.id === "wompi"
-                  ? "Pagar con Wompi"
-                  : "Avisar a la Fundación"}
-            </Button>
-            {!isReady ? (
-              <p className="mt-2 text-center text-xs text-muted-foreground">
-                {selectedMethod.id === "daviplata"
-                  ? "Esta opción estará disponible cuando la Fundación configure los datos de recepción."
-                  : "Esta opción estará disponible cuando la Fundación configure el enlace oficial de PayPal."}
-              </p>
-            ) : null}
-          </div>
-        </form>
-        {hasReportedIntent && selectedMethod.id === "daviplata" ? (
-          <div className="mt-5 rounded-xl border border-border bg-muted/40 p-4">
-            <p className="text-sm font-medium text-foreground">
-              Transfiere {formatAmount(numericAmount, selectedMethod.currency)} a{" "}
-              {selectedMethod.holder || "la cuenta DaviPlata de la Fundación"}:
-            </p>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <span className="break-all font-semibold text-foreground">
-                {selectedMethod.receiver}
-              </span>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => void copyDaviplataNumber()}
-              >
-                <Copy className="h-4 w-4" />
-                {copied ? "Copiado" : "Copiar número"}
-              </Button>
+            }}
+            className="grid gap-4 sm:grid-cols-2"
+          >
+            <label className="block space-y-1.5 text-sm font-medium">
+              Nombre completo
+              <input
+                name="nombre"
+                type="text"
+                required
+                maxLength={200}
+                autoComplete="name"
+                className={fieldClass}
+              />
+            </label>
+            <label className="block space-y-1.5 text-sm font-medium">
+              Teléfono
+              <input
+                name="telefono"
+                type="tel"
+                required
+                minLength={7}
+                maxLength={50}
+                autoComplete="tel"
+                className={fieldClass}
+              />
+            </label>
+            <label className="block space-y-1.5 text-sm font-medium sm:col-span-2">
+              Correo electrónico
+              <input
+                name="correo"
+                type="email"
+                required
+                maxLength={320}
+                autoComplete="email"
+                className={fieldClass}
+              />
+            </label>
+            <div aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden">
+              <label>
+                No llenar
+                <input name="website" tabIndex={-1} autoComplete="off" />
+              </label>
             </div>
-            {copyError ? (
-              <p role="status" className="mt-2 text-xs text-destructive">
-                No se pudo copiar. Selecciona y copia el número manualmente.
+            <div className="sm:col-span-2">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={
+                  status === "sending" ||
+                  !isReady ||
+                  !Number.isFinite(numericAmount) ||
+                  hasReportedIntent
+                }
+              >
+                {status === "sending" ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {status === "sending"
+                  ? selectedMethod.id === "wompi"
+                    ? "Preparando pago…"
+                    : "Enviando aviso…"
+                  : selectedMethod.id === "wompi"
+                    ? "Pagar con Wompi"
+                    : "Avisar a la Fundación"}
+              </Button>
+              {!isReady ? (
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  La cuenta DaviPlata aún no está configurada.
+                </p>
+              ) : null}
+            </div>
+          </form>
+
+          {hasReportedIntent && selectedMethod.id === "daviplata" ? (
+            <div className="rounded-xl border border-border bg-muted/40 p-4">
+              <p className="text-sm font-medium text-foreground">
+                Transfiere {formatAmount(numericAmount, selectedMethod.currency)} a{" "}
+                {selectedMethod.holder || "la cuenta DaviPlata de la Fundación"}:
               </p>
-            ) : null}
-          </div>
-        ) : null}
-        <p className="mt-3 text-xs text-muted-foreground">
-          Usaremos tus datos para enviar este aviso a la Fundación. No ingreses claves ni datos
-          bancarios.
-        </p>
-      </div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                <span className="break-all font-semibold text-foreground">
+                  {selectedMethod.receiver}
+                </span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void copyDaviplataNumber()}
+                >
+                  <Copy className="h-4 w-4" />
+                  {copied ? "Copiado" : "Copiar número"}
+                </Button>
+              </div>
+              {copyError ? (
+                <p role="status" className="mt-2 text-xs text-destructive">
+                  No se pudo copiar. Selecciona y copia el número manualmente.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <p className="text-xs text-muted-foreground">
+            Usaremos tus datos para el pago o aviso. No ingreses claves ni datos bancarios.
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
